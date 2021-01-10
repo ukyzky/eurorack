@@ -267,19 +267,6 @@ void Ui::UpdateLEDs() {
       leds_.set(LED_X_CONTROL_MODE, !blink ? LED_COLOR_RED : LED_COLOR_OFF);
       leds_.set(LED_X_RANGE, blink ? LED_COLOR_RED : LED_COLOR_OFF);
       break;
-
-    // case UI_MODE_SAVE:
-    //   leds_.set(LED_T_MODEL, blink ? LED_COLOR_RED : LED_COLOR_OFF);
-    //   leds_.set(LED_T_RANGE, blink ? LED_COLOR_RED : LED_COLOR_OFF);
-    //   leds_.set(LED_X_CONTROL_MODE, LED_COLOR_OFF);
-    //   leds_.set(LED_X_RANGE, LED_COLOR_OFF);
-    //   break;
-    // case UI_MODE_LOAD:
-    //   leds_.set(LED_T_MODEL, LED_COLOR_OFF);
-    //   leds_.set(LED_T_RANGE, LED_COLOR_OFF);
-    //   leds_.set(LED_X_CONTROL_MODE, blink ? LED_COLOR_RED : LED_COLOR_OFF);
-    //   leds_.set(LED_X_RANGE, blink ? LED_COLOR_RED : LED_COLOR_OFF);
-    //   break;
   }
   leds_.Write();
 }
@@ -308,91 +295,26 @@ void Ui::OnSwitchReleased(const Event& e) {
     return;
   }
 
-  // if (e.control_id == SWITCH_T_DEJA_VU && switches_.pressed(SWITCH_T_RANGE)) {
-  //   mode_ = UI_MODE_SAVE;
-  //   ignore_release_[SWITCH_T_DEJA_VU] = ignore_release_[SWITCH_T_RANGE] = true;
-  //   return;
-  // }
-  // if (e.control_id == SWITCH_X_DEJA_VU && switches_.pressed(SWITCH_T_RANGE)) {
-  //   mode_ = UI_MODE_LOAD;
-  //   ignore_release_[SWITCH_X_DEJA_VU] = ignore_release_[SWITCH_T_RANGE] = true;
-  //   return;
-  // }
-  // if (mode_ == UI_MODE_SAVE) {
-  //   switch (e.control_id) {
-  //     case SWITCH_T_DEJA_VU:
-  //       break;
-  //     case SWITCH_X_DEJA_VU:
-  //       break;
-  //     case SWITCH_T_MODEL:
-  //       break;
-  //     case SWITCH_T_RANGE:
-  //       break;
-  //     case SWITCH_X_MODE:
-  //       break;
-  //     case SWITCH_X_EXT:
-  //       break;
-  //     case SWITCH_X_RANGE:
-  //       break;
-  //   }
-  //   return;
-  // }
-  // if (mode_ == UI_MODE_LOAD) {
-  //   switch (e.control_id) {
-  //     case SWITCH_T_DEJA_VU:
-  //       break;
-  //     case SWITCH_X_DEJA_VU:
-  //       break;
-  //     case SWITCH_T_MODEL:
-  //       break;
-  //     case SWITCH_T_RANGE:
-  //       break;
-  //     case SWITCH_X_MODE:
-  //       break;
-  //     case SWITCH_X_EXT:
-  //       break;
-  //     case SWITCH_X_RANGE:
-  //       break;
-  //   }
-  //   return;
-  // }
   if (switches_.pressed(SWITCH_T_RANGE)) {
     if (e.control_id == SWITCH_T_DEJA_VU) {
       // save slot A
       save_slot_index_ = 0;
+      load_slot_index_ = -1;
       ignore_release_[SWITCH_T_DEJA_VU] = ignore_release_[SWITCH_T_RANGE] = true;
       return;
     }
     if (e.control_id == SWITCH_X_DEJA_VU) {
-      // save slot B
-      save_slot_index_ = 1;
+      // load slot A
+      load_slot_index_ = 0;
+      save_slot_index_ = -1;
       ignore_release_[SWITCH_X_DEJA_VU] = ignore_release_[SWITCH_T_RANGE] = true;
       return;
     }
     if (e.control_id == SWITCH_X_EXT) {
       // cancel save
       save_slot_index_ = -1;
-      ignore_release_[SWITCH_X_EXT] = ignore_release_[SWITCH_T_RANGE] = true;
-      return;
-    }
-  }
-  if (switches_.pressed(SWITCH_X_RANGE)) {
-    if (e.control_id == SWITCH_T_DEJA_VU) {
-      // load slot A
-      load_slot_index_ = 0;
-      ignore_release_[SWITCH_T_DEJA_VU] = ignore_release_[SWITCH_X_RANGE] = true;
-      return;
-    }
-    if (e.control_id == SWITCH_X_DEJA_VU) {
-      // load slot B
-      load_slot_index_ = 1;
-      ignore_release_[SWITCH_X_DEJA_VU] = ignore_release_[SWITCH_X_RANGE] = true;
-      return;
-    }
-    if (e.control_id == SWITCH_X_EXT) {
-      // cancel load
       load_slot_index_ = -1;
-      ignore_release_[SWITCH_X_EXT] = ignore_release_[SWITCH_X_RANGE] = true;
+      ignore_release_[SWITCH_X_EXT] = ignore_release_[SWITCH_T_RANGE] = true;
       return;
     }
   }

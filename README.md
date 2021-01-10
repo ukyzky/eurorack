@@ -10,12 +10,12 @@ Play scenario is:
 
 1. Explore great random rhythm by changing "deja vu knob" with deja vu enabled.
 2. Lock the great rhythm by setting "deja vu knob" to 50%(12 o'clock).
-3. (NEW FUNCTION) Save the rhythm by holding "time rate switch" and "deja vu switch (t for slotA, x for slotB)".
+3. (NEW FUNCTION) Save the rhythm by holding "T rate switch" and "T deja vu switch".
 4. Explore another great random rhythm by changing "deja vu knob".
 5. Lock the great rhythm by setting "deja vu knob" to 50%.
-6. (NEW FUNCTION) Load the previous rhythm by holding "voltage range switch" and "deja vu switch (t for slotA, x for slotB)".
+6. (NEW FUNCTION) Load the previous rhythm by holding "T rate switch" and "X deja vu switch".
 
-Notes: please hold "voltage range switch" in short time (for avoiding to recognize long press).
+Notes: After press "T rate switch", for canceling save/load, press "external mode switch".
 
 =======
 

@@ -53,8 +53,6 @@ enum UiMode {
   UI_MODE_CALIBRATION_3,
   UI_MODE_CALIBRATION_4,
   UI_MODE_PANIC,
-  // UI_MODE_SAVE,
-  // UI_MODE_LOAD
 };
 
 enum FactoryTestingCommand {
