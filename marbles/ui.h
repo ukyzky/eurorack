@@ -53,6 +53,8 @@ enum UiMode {
   UI_MODE_CALIBRATION_3,
   UI_MODE_CALIBRATION_4,
   UI_MODE_PANIC,
+  // UI_MODE_SAVE,
+  // UI_MODE_LOAD
 };
 
 enum FactoryTestingCommand {
@@ -101,7 +103,20 @@ class Ui {
   void set_deja_vu_lock(bool deja_vu_lock) {
     deja_vu_lock_ = deja_vu_lock;
   }
-  
+
+  int save_slot_index() const {
+    return save_slot_index_;
+  }
+
+  int load_slot_index() const {
+    return load_slot_index_;
+  }
+
+  void clear_slot_index() {
+    save_slot_index_ = -1;
+    load_slot_index_ = -1;
+  }
+
  private:
   void UpdateLEDs();
   void OnSwitchPressed(const stmlib::Event& e);
@@ -138,6 +153,11 @@ class Ui {
   bool output_test_mode_;
   uint16_t output_test_forced_dac_code_[4];
   uint32_t calibration_data_;
+
+  // save slot index (-1: not set, 0-: save slot index)
+  int save_slot_index_;
+  // load slot index (-1: not set, 0-: load slot index)
+  int load_slot_index_;
   
   DISALLOW_COPY_AND_ASSIGN(Ui);
 };

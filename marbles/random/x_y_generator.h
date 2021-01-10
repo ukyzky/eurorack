@@ -106,6 +106,18 @@ class XYGenerator {
       output_channel_[i].LoadScale(scale_index, scale);
     }
   }
+
+  inline void save_slot(int slot_index) {
+    for (size_t i = 0; i < kNumChannels; ++i) {
+      random_sequence_[i].save_slot(slot_index);
+    }
+  }
+
+  inline void load_slot(int slot_index) {
+    for (size_t i = 0; i < kNumChannels; ++i) {
+      random_sequence_[i].load_slot(slot_index);
+    }
+  }
   
  private:
   RandomSequence random_sequence_[kNumChannels];

@@ -40,6 +40,8 @@ namespace marbles {
 const int kDejaVuBufferSize = 16;
 const int kHistoryBufferSize = 16;
 
+const int kLoopSlotNum = 2;
+
 const float kMaxUint32 = 4294967296.0f;
 
 class RandomSequence {
@@ -51,6 +53,9 @@ class RandomSequence {
     random_stream_ = random_stream;
     for (int i = 0; i < kDejaVuBufferSize; ++i) {
       loop_[i] = random_stream_->GetFloat();
+      for (int j = 0; j < kLoopSlotNum; ++j) {
+        loop_slot_[j][i] = loop_[i];
+      }
     }
     std::fill(&history_[0], &history_[kHistoryBufferSize], 0.0f);
 
@@ -102,6 +107,13 @@ class RandomSequence {
     redo_write_history_ptr_ = source.redo_write_history_ptr_
         ? &history_[source.redo_write_history_ptr_ - &source.history_[0]]
         : NULL;
+
+    for (int i = 0; i < kLoopSlotNum; ++i) {
+      std::copy(
+          &source.loop_slot_[i][0],
+          &source.loop_slot_[i][kDejaVuBufferSize],
+          &loop_slot_[i][0]);
+    }
   }
   
   inline void Record() {
@@ -233,6 +245,18 @@ class RandomSequence {
     return length_;
   }
 
+  inline void save_slot(int slot_index) {
+    for (int i = 0; i < kDejaVuBufferSize; ++i) {
+      loop_slot_[slot_index][i] = loop_[i];
+    }
+  }
+
+  inline void load_slot(int slot_index) {
+    for (int i = 0; i < kDejaVuBufferSize; ++i) {
+      loop_[i] = loop_slot_[slot_index][i];
+    }
+  }
+
  private:
   RandomStream* random_stream_;
   float loop_[kDejaVuBufferSize];
@@ -255,6 +279,8 @@ class RandomSequence {
   float* redo_write_ptr_;
   float* redo_write_history_ptr_;
   
+  float loop_slot_[kLoopSlotNum][kDejaVuBufferSize];
+
   DISALLOW_COPY_AND_ASSIGN(RandomSequence);
 };
 

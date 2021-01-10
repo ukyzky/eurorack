@@ -126,6 +126,14 @@ class TGenerator {
   inline void set_pulse_width_std(float pulse_width_std) {
     pulse_width_std_ = pulse_width_std;
   }
+
+  inline void save_slot(int slot_index) {
+    sequence_.save_slot(slot_index);
+  }
+
+  inline void load_slot(int slot_index) {
+    sequence_.load_slot(slot_index);
+  }
   
  private:
   union RandomVector {

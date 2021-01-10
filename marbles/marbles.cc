@@ -267,6 +267,17 @@ void Process(IOBuffer::Block* block, size_t size) {
     }
   }
 
+  // If needed, do save/load and clear save/load state.
+  if (ui.save_slot_index() >= 0) {
+    t_generator.save_slot(ui.save_slot_index());
+    xy_generator.save_slot(ui.save_slot_index());
+    ui.clear_slot_index();
+  } else if (ui.load_slot_index() >= 0) {
+    t_generator.load_slot(ui.load_slot_index());
+    xy_generator.load_slot(ui.load_slot_index());
+    ui.clear_slot_index();
+  }
+
   // Generate gates for T-section (16%).
   ramps.master = &ramp_buffer[0];
   ramps.external = &ramp_buffer[kBlockSize];

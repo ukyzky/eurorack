@@ -1,3 +1,24 @@
+# Marbles alternate firmware "resurrection"
+
+This firmware adds a function of save/load random loop sequence in memory.
+
+We can explore vast sea of random rhythm and return to the previous discovered precious random rhythm.
+
+It's useful for live performance.
+
+Play scenario is:
+
+1. Explore great random rhythm by changing "deja vu knob" with deja vu enabled.
+2. Lock the great rhythm by setting "deja vu knob" to 50%(12 o'clock).
+3. (NEW FUNCTION) Save the rhythm by holding "time rate switch" and "deja vu switch (t for slotA, x for slotB)".
+4. Explore another great random rhythm by changing "deja vu knob".
+5. Lock the great rhythm by setting "deja vu knob" to 50%.
+6. (NEW FUNCTION) Load the previous rhythm by holding "voltage range switch" and "deja vu switch (t for slotA, x for slotB)".
+
+Notes: please hold "voltage range switch" in short time (for avoiding to recognize long press).
+
+=======
+
 Mutable Instruments' Eurorack Modules.
 
 * [Blinds](http://mutable-instruments.net/modules/blinds): Quad VC-polarizer.
