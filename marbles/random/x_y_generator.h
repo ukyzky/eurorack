@@ -81,6 +81,7 @@ struct GroupSettings {
   int scale_index;
   int length;
   Ratio ratio;
+  int start;
 };
 
 class XYGenerator {

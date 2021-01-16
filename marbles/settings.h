@@ -82,8 +82,10 @@ struct State {
   uint8_t y_range;
   
   uint8_t color_blind;
-  
-  uint8_t padding[8];
+
+  uint8_t loop_start;
+
+  uint8_t padding[7];
 
   enum { tag = 0x54415453 };
 };

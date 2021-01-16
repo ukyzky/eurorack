@@ -53,6 +53,7 @@ const LedColor Ui::palette_[4] = {
 
 /* static */
 AlternateKnobMapping Ui::alternate_knob_mappings_[ADC_CHANNEL_LAST];
+AdditionalAlternateKnobMapping Ui::additional_alternate_knob_mappings_[ADDITIONAL_ALTERNATE_KNOB_LAST];
 
 void Ui::Init(
     Settings* settings,
@@ -87,7 +88,11 @@ void Ui::Init(
   alternate_knob_mappings_[ADC_CHANNEL_X_BIAS].destination = &state->y_bias;
   alternate_knob_mappings_[ADC_CHANNEL_X_STEPS].unlock_switch = SWITCH_X_MODE;
   alternate_knob_mappings_[ADC_CHANNEL_X_STEPS].destination = &state->y_steps;
-  
+
+  additional_alternate_knob_mappings_[ADDITIONAL_ALTERNATE_KNOB_LOOP_START].adc_parameter = ADC_CHANNEL_DEJA_VU_LENGTH;
+  additional_alternate_knob_mappings_[ADDITIONAL_ALTERNATE_KNOB_LOOP_START].unlock_switch = SWITCH_T_RANGE;
+  additional_alternate_knob_mappings_[ADDITIONAL_ALTERNATE_KNOB_LOOP_START].destination = &state->loop_start;
+
   setting_modification_flag_ = false;
   output_test_mode_ = false;
   
@@ -483,6 +488,22 @@ void Ui::UpdateHiddenParameters() {
 
         // The next time a switch is released, we unlock the pots.
         setting_modification_flag_ = true;
+      } else {
+        for (int j = 0; j < ADDITIONAL_ALTERNATE_KNOB_LAST; ++j) {
+          AdditionalAlternateKnobMapping additional_mapping = additional_alternate_knob_mappings_[j];
+          if (additional_mapping.adc_parameter == i) {
+            if (switches_.pressed(additional_mapping.unlock_switch)) {
+              if (additional_mapping.unlock_switch == SWITCH_T_RANGE && new_value < 0.08f) {
+                new_value = 0.0f;
+              }
+              *additional_mapping.destination = static_cast<uint8_t>(new_value * 255.0f);
+              cv_reader_->mutable_channel(i)->LockPot();
+
+              // The next time a switch is released, we unlock the pots.
+              setting_modification_flag_ = true;
+            }
+          }
+        }
       }
     }
   }

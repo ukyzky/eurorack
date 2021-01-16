@@ -289,7 +289,12 @@ void Process(IOBuffer::Block* block, size_t size) {
       loop_length,
       parameters[ADC_CHANNEL_DEJA_VU_LENGTH],
       sizeof(loop_length) / sizeof(int));
-  
+
+  int deja_vu_start = deja_vu_length_quantizer.Lookup(
+      loop_length,
+      state.loop_start / 255.f,
+      sizeof(loop_length) / sizeof(int));
+
   t_generator.set_model(TGeneratorModel(state.t_model));
   t_generator.set_range(TGeneratorRange(state.t_range));
   t_generator.set_rate(parameters[ADC_CHANNEL_T_RATE]);
@@ -300,6 +305,7 @@ void Process(IOBuffer::Block* block, size_t size) {
           ? 0.5f
           : (state.t_deja_vu == DEJA_VU_ON ? deja_vu : 0.0f));
   t_generator.set_length(deja_vu_length);
+  t_generator.set_start(deja_vu_start);
   t_generator.set_pulse_width_mean(float(state.t_pulse_width_mean) / 256.0f);
   t_generator.set_pulse_width_std(float(state.t_pulse_width_std) / 256.0f);
   t_generator.Process(
@@ -353,6 +359,7 @@ void Process(IOBuffer::Block* block, size_t size) {
         ? 0.5f
         : (state.x_deja_vu == DEJA_VU_ON ? deja_vu : 0.0f);
     x.length = deja_vu_length;
+    x.start = deja_vu_start;
     x.ratio.p = 1;
     x.ratio.q = 1;
   
@@ -365,6 +372,7 @@ void Process(IOBuffer::Block* block, size_t size) {
     y.steps = float(state.y_steps) / 256.0f;
     y.deja_vu = 0.0f;
     y.length = 1;
+    y.start = 1;
     y.ratio = y_divider_ratios[
         static_cast<uint16_t>(state.y_divider) * 12 >> 8];
     

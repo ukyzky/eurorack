@@ -71,6 +71,17 @@ struct AlternateKnobMapping {
   uint8_t* destination;
 };
 
+enum AdditionalAlternateKnob {
+  ADDITIONAL_ALTERNATE_KNOB_LOOP_START,
+  ADDITIONAL_ALTERNATE_KNOB_LAST
+};
+
+struct AdditionalAlternateKnobMapping {
+  AdcParameter adc_parameter;
+  Switch unlock_switch;
+  uint8_t* destination;
+};
+
 class Ui {
  public:
   Ui() { }
@@ -142,6 +153,7 @@ class Ui {
   
   static const LedColor palette_[4];
   static AlternateKnobMapping alternate_knob_mappings_[ADC_CHANNEL_LAST];
+  static AdditionalAlternateKnobMapping additional_alternate_knob_mappings_[ADDITIONAL_ALTERNATE_KNOB_LAST];
   
   float pot_value_[ADC_CHANNEL_LAST];
   

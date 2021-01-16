@@ -162,6 +162,7 @@ void XYGenerator::Process(
     RandomSequence* sequence = &random_sequence_[i];
     sequence->Record();
     sequence->set_length(settings.length);
+    sequence->set_start(settings.start);
     sequence->set_deja_vu(settings.deja_vu);
     
     bool use_shifted_sequences = false;

@@ -119,6 +119,10 @@ class TGenerator {
     sequence_.set_length(length);
   }
 
+  inline void set_start(int start) {
+    sequence_.set_start(start);
+  }
+
   inline void set_pulse_width_mean(float pulse_width_mean) {
     pulse_width_mean_ = pulse_width_mean;
   }
