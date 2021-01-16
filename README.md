@@ -1,6 +1,11 @@
-# Marbles alternate firmware "resurrection"
+# Marbles alternative firmware "resurrection"
 
-This firmware adds a function of save/load random loop sequence in memory.
+This firmware adds some functions to Marbles.
+
+- save/load loop sequence in memory.
+- set loop start position.
+
+## Save/Load loop sequence in memory
 
 We can explore vast sea of random rhythm and return to the previous discovered precious random rhythm.
 
@@ -16,6 +21,19 @@ Play scenario is:
 6. (NEW FUNCTION) Load the previous rhythm by holding "T rate switch" then pressing "X deja vu switch". (It's not pressing the two buttons at the same time. At first holding the button, then pressing the another button.)
 
 Notes: After press "T rate switch", for canceling save/load, press "external mode switch".
+
+## Set loop start position
+
+We can select short length loop patterns from precious random rhythm.
+
+It's useful for live performance.
+
+Play scenario is:
+
+1. Explore great random rhythm by changing "deja vu knob" with deja vu enabled.
+2. Lock the great rhythm by setting "deja vu knob" to 50%(12 o'clock).
+3. Set deja vu loop length using "loop length knob".
+4. (NEW FUNCTION) Set deja vu loop start position by holding "T rate switch" then using "loop length knob".
 
 =======
 
