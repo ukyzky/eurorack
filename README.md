@@ -1,9 +1,29 @@
-# Marbles alternative firmware "resurrection"
+# Marbles alternative firmware v02
 
-This firmware adds some functions to Marbles.
+This firmware adds some functions to Marbles v1.2.
 
 - save/load loop sequence in memory.
 - set loop start position.
+
+## Change log
+
+### v02
+
+- Change save/load UI.
+- Fix save/load reproductibity problem when T mode is "coin toss" / "multiply and divide".
+- Add function of setting loop start position.
+
+### v01
+
+- Add function of save/load loop sequence.
+
+## Known issues
+
+### v02
+
+- save/load reproductibity sometimes failed when T mode is "drum algorithm".
+
+- setting loop start position is not stable when loop length is 1.
 
 ## Save/Load loop sequence in memory
 
@@ -15,12 +35,20 @@ Play scenario is:
 
 1. Explore great random rhythm by changing "deja vu knob" with deja vu enabled.
 2. Lock the great rhythm by setting "deja vu knob" to 50%(12 o'clock).
-3. (NEW FUNCTION) Save the rhythm by holding "T rate switch" then pressing "T deja vu switch". (It's not pressing the two buttons at the same time. At first holding the button, then pressing the another button.)
+3. (NEW FUNCTION) Save the rhythm
+  - 3a. long-press "T rate switch".
+  - 3b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in save/load mode.)
+  - 3c. then press "T deja vu switch".
+  - 3d. then "T rate LED" becomes fast-blink in a short moment. (It represents saving is executed.)
 4. Explore another great random rhythm by changing "deja vu knob".
 5. Lock the great rhythm by setting "deja vu knob" to 50%.
-6. (NEW FUNCTION) Load the previous rhythm by holding "T rate switch" then pressing "X deja vu switch". (It's not pressing the two buttons at the same time. At first holding the button, then pressing the another button.)
+6. (NEW FUNCTION) Load the previous rhythm
+  - 6a. long-press "T rate switch".
+  - 6b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in save/load mode.)
+  - 6c. then press "X deja vu switch".
+  - 6d. then "T rate LED" becomes fast-blink in a short moment. (It represents loading is executed.)
 
-Notes: After press "T rate switch", for canceling save/load, press "external mode switch".
+7. Notes: After long-press "T rate switch" ("T rate LED" is blinking), for canceling save/load, press "T rate switch".
 
 ## Set loop start position
 
