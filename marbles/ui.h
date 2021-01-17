@@ -53,6 +53,8 @@ enum UiMode {
   UI_MODE_CALIBRATION_3,
   UI_MODE_CALIBRATION_4,
   UI_MODE_PANIC,
+  UI_MODE_SAVELOAD,
+  UI_MODE_SAVELOAD_CONFIRMED,
 };
 
 enum FactoryTestingCommand {
@@ -168,6 +170,8 @@ class Ui {
   int save_slot_index_;
   // load slot index (-1: not set, 0-: load slot index)
   int load_slot_index_;
+  // save or load confirmed tick count (for controling LED)
+  uint16_t saveload_confirmed_tick_count_;
   
   DISALLOW_COPY_AND_ASSIGN(Ui);
 };

@@ -39,6 +39,8 @@
 namespace marbles {
 
 const int32_t kLongPressDuration = 2000;
+const int32_t kMiddlePressDuration = 1000;
+const int32_t kSaveLoadConfirmedLedTickCount = 1000;
 
 using namespace std;
 using namespace stmlib;
@@ -142,6 +144,14 @@ void Ui::Poll() {
       ignore_release_[i] = true;
     }
   }
+
+  if (mode_ == UI_MODE_SAVELOAD_CONFIRMED) {
+    saveload_confirmed_tick_count_ += 1;
+    if (saveload_confirmed_tick_count_ > kSaveLoadConfirmedLedTickCount) {
+      saveload_confirmed_tick_count_ = 0;
+      mode_ = UI_MODE_NORMAL;
+    }
+  }
   
   UpdateLEDs();
 }
@@ -220,9 +230,17 @@ void Ui::UpdateLEDs() {
   switch (mode_) {
     case UI_MODE_NORMAL:
     case UI_MODE_RECORD_SCALE:
+    case UI_MODE_SAVELOAD:
+    case UI_MODE_SAVELOAD_CONFIRMED:
       {
         leds_.set(LED_T_MODEL, MakeColor(state.t_model, cb));
-        leds_.set(LED_T_RANGE, MakeColor(state.t_range, cb));
+        if (mode_ == UI_MODE_SAVELOAD) {
+          leds_.set(LED_T_RANGE, blink ? MakeColor(state.t_range, cb) : LED_COLOR_OFF);
+        } else if (mode_ == UI_MODE_SAVELOAD_CONFIRMED) {
+          leds_.set(LED_T_RANGE, fast_blink ? MakeColor(state.t_range, cb) : LED_COLOR_OFF);
+        } else {
+          leds_.set(LED_T_RANGE, MakeColor(state.t_range, cb));
+        }
         leds_.set(
             LED_T_DEJA_VU,
             DejaVuColor(DejaVuState(state.t_deja_vu), deja_vu_lock_));
@@ -232,7 +250,7 @@ void Ui::UpdateLEDs() {
             LED_X_DEJA_VU,
             DejaVuColor(DejaVuState(state.x_deja_vu), deja_vu_lock_));
         
-        if (mode_ == UI_MODE_NORMAL) {
+        if (mode_ == UI_MODE_NORMAL || mode_ == UI_MODE_SAVELOAD || mode_ == UI_MODE_SAVELOAD_CONFIRMED) {
           leds_.set(LED_X_RANGE,
                     state.x_register_mode
                         ? LED_COLOR_OFF
@@ -300,26 +318,32 @@ void Ui::OnSwitchReleased(const Event& e) {
     return;
   }
 
-  if (switches_.pressed(SWITCH_T_RANGE)) {
+  if (mode_ == UI_MODE_SAVELOAD) {
     if (e.control_id == SWITCH_T_DEJA_VU) {
       // save slot A
       save_slot_index_ = 0;
       load_slot_index_ = -1;
-      ignore_release_[SWITCH_T_DEJA_VU] = ignore_release_[SWITCH_T_RANGE] = true;
+      saveload_confirmed_tick_count_ = 0;
+      ignore_release_[SWITCH_T_DEJA_VU] = true;
+      mode_ = UI_MODE_SAVELOAD_CONFIRMED;
       return;
     }
     if (e.control_id == SWITCH_X_DEJA_VU) {
       // load slot A
       load_slot_index_ = 0;
       save_slot_index_ = -1;
-      ignore_release_[SWITCH_X_DEJA_VU] = ignore_release_[SWITCH_T_RANGE] = true;
+      saveload_confirmed_tick_count_ = 0;
+      ignore_release_[SWITCH_X_DEJA_VU] = true;
+      mode_ = UI_MODE_SAVELOAD_CONFIRMED;
       return;
     }
-    if (e.control_id == SWITCH_X_EXT) {
+    if (e.control_id == SWITCH_T_RANGE) {
       // cancel save
       save_slot_index_ = -1;
       load_slot_index_ = -1;
-      ignore_release_[SWITCH_X_EXT] = ignore_release_[SWITCH_T_RANGE] = true;
+      saveload_confirmed_tick_count_ = 0;
+      ignore_release_[SWITCH_T_RANGE] = true;
+      mode_ = UI_MODE_NORMAL;
       return;
     }
   }
@@ -376,10 +400,16 @@ void Ui::OnSwitchReleased(const Event& e) {
       {
         if (mode_ >= UI_MODE_CALIBRATION_1 && mode_ <= UI_MODE_CALIBRATION_4) {
           NextCalibrationStep();
+          SaveState();
         } else {
-          state->t_range = (state->t_range + 1) % 3;
+          if (e.data >= kMiddlePressDuration) {
+            mode_ = UI_MODE_SAVELOAD;
+            ignore_release_[SWITCH_T_RANGE] = true;
+          } else {
+            state->t_range = (state->t_range + 1) % 3;
+            SaveState();
+          }
         }
-        SaveState();
       }
       break;
     
