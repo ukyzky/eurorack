@@ -60,6 +60,9 @@ class RandomSequence {
     std::fill(&history_[0], &history_[kHistoryBufferSize], 0.0f);
 
     loop_write_head_ = 0;
+    for (int i = 0; i < kLoopSlotNum; ++i) {
+      loop_write_head_slot_[i] = loop_write_head_;
+    }
     length_ = 8;
     step_ = 0;
 
@@ -115,6 +118,7 @@ class RandomSequence {
           &source.loop_slot_[i][0],
           &source.loop_slot_[i][kDejaVuBufferSize],
           &loop_slot_[i][0]);
+      loop_write_head_slot_[i] = source.loop_write_head_slot_[i];
     }
     start_ = source.start_;
   }
@@ -293,12 +297,14 @@ class RandomSequence {
     for (int i = 0; i < kDejaVuBufferSize; ++i) {
       loop_slot_[slot_index][i] = loop_[i];
     }
+    loop_write_head_slot_[slot_index] = loop_write_head_;
   }
 
   inline void load_slot(int slot_index) {
     for (int i = 0; i < kDejaVuBufferSize; ++i) {
       loop_[i] = loop_slot_[slot_index][i];
     }
+    loop_write_head_ = loop_write_head_slot_[slot_index];
   }
 
  private:
@@ -324,6 +330,7 @@ class RandomSequence {
   float* redo_write_history_ptr_;
   
   float loop_slot_[kLoopSlotNum][kDejaVuBufferSize];
+  int loop_write_head_slot_[kLoopSlotNum];
   int start_;
 
   DISALLOW_COPY_AND_ASSIGN(RandomSequence);
