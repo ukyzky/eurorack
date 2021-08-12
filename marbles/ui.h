@@ -98,6 +98,8 @@ class Ui {
   void DoEvents();
   void FlushEvents();
   uint8_t HandleFactoryTestingRequest(uint8_t command);
+  void EnterAdditionalAlternateKnobMapping();
+  void ExitAdditionalAlternateKnobMapping();
   
   bool recording_scale() const {
     return mode_ == UI_MODE_RECORD_SCALE;
@@ -172,6 +174,8 @@ class Ui {
   int load_slot_index_;
   // save or load confirmed tick count (for controling LED)
   uint16_t saveload_confirmed_tick_count_;
+
+  bool additional_alternate_knob_mapping_mode_;
   
   DISALLOW_COPY_AND_ASSIGN(Ui);
 };
