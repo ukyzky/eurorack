@@ -1,6 +1,6 @@
 # Marbles alternative firmware v03
 
-This firmware adds some functions to Marbles v1.2.
+This firmware adds some functions to Marbles v1.2+ (Jul 4, 2021).
 
 - save/load loop sequence in volatile memory (RAM).
 - set loop start position.
@@ -9,7 +9,7 @@ This firmware adds some functions to Marbles v1.2.
 
 ### v03
 
-- Change set start position UI.
+- Change setting start position UI.
 - Fix save/load reproductibity problem when T mode is "drum algorithm".
 
 ### v02
@@ -21,14 +21,6 @@ This firmware adds some functions to Marbles v1.2.
 ### v01
 
 - Add function of save/load loop sequence.
-
-## Known issues
-
-### v02
-
-- save/load reproductibity sometimes failed when T mode is "drum algorithm".
-
-- setting loop start position is not stable when loop length is 1.
 
 ## Save/Load loop sequence in volatile memory (RAM)
 
@@ -44,14 +36,14 @@ Play scenario is:
   - 3a. long-press "T rate switch".
   - 3b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in save/load mode.)
   - 3c. then press "T deja vu switch".
-  - 3d. then "T rate LED" becomes fast-blink in a short moment. (It represents saving is executed.)
+  - 3d. then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents saving is executed.)
 4. Explore another great random rhythm by changing "deja vu knob".
 5. Lock the great rhythm by setting "deja vu knob" to 50%.
 6. (NEW FUNCTION) Load the previous rhythm
   - 6a. long-press "T rate switch".
   - 6b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in save/load mode.)
   - 6c. then press "X deja vu switch".
-  - 6d. then "T rate LED" becomes fast-blink in a short moment. (It represents loading is executed.)
+  - 6d. then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents loading is executed.)
 
 7. Notes: After long-press "T rate switch" ("T rate LED" is blinking), for canceling save/load, press "T rate switch".
 
@@ -69,12 +61,12 @@ Play scenario is:
 
 4. (NEW FUNCTION) Set deja vu loop start position
 
-  In save/load mode, "loop length knob" works as setting loop start position.
+  - In save/load mode, "loop length knob" works as setting loop start position.
 
   - 4a. long-press "T rate switch".
   - 4b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in save/load mode.)
   - 4c. turn "loop length knob" to set loop start position.
-  - 4d. push "T rate switch".
+  - 4d. push "T rate switch". then "T rate LED" stop blink. (It represents save/load mode exited.)
 
 =======
 
