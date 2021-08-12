@@ -1,11 +1,16 @@
-# Marbles alternative firmware v02
+# Marbles alternative firmware v03
 
 This firmware adds some functions to Marbles v1.2.
 
-- save/load loop sequence in memory.
+- save/load loop sequence in volatile memory (RAM).
 - set loop start position.
 
 ## Change log
+
+### v03
+
+- Change set start position UI.
+- Fix save/load reproductibity problem when T mode is "drum algorithm".
 
 ### v02
 
@@ -25,7 +30,7 @@ This firmware adds some functions to Marbles v1.2.
 
 - setting loop start position is not stable when loop length is 1.
 
-## Save/Load loop sequence in memory
+## Save/Load loop sequence in volatile memory (RAM)
 
 We can explore vast sea of random rhythm and return to the previous discovered precious random rhythm.
 
@@ -61,7 +66,15 @@ Play scenario is:
 1. Explore great random rhythm by changing "deja vu knob" with deja vu enabled.
 2. Lock the great rhythm by setting "deja vu knob" to 50%(12 o'clock).
 3. Set deja vu loop length using "loop length knob".
-4. (NEW FUNCTION) Set deja vu loop start position by holding "T rate switch" then using "loop length knob".
+
+4. (NEW FUNCTION) Set deja vu loop start position
+
+  In save/load mode, "loop length knob" works as setting loop start position.
+
+  - 4a. long-press "T rate switch".
+  - 4b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in save/load mode.)
+  - 4c. turn "loop length knob" to set loop start position.
+  - 4d. push "T rate switch".
 
 =======
 
