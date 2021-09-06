@@ -63,7 +63,9 @@ void XYGenerator::Process(
     const GateFlags* external_clock,
     const Ramps& ramps,
     float* output,
-    size_t size) {
+    size_t size,
+    const stmlib::GateFlags* external_reset,
+    bool external_hold) {
   float* channel_ramp[kNumChannels];
   
   if (clock_source != CLOCK_SOURCE_EXTERNAL) {
@@ -192,7 +194,7 @@ void XYGenerator::Process(
     }
     use_shifted_sequences_[i] = use_shifted_sequences;
     
-    channel.Process(sequence, channel_ramp[i], &output[i], size, kNumChannels);
+    channel.Process(sequence, channel_ramp[i], &output[i], size, kNumChannels, external_reset, external_hold);
   }
 }
 

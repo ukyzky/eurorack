@@ -69,6 +69,7 @@ void Ui::Init(
 
   save_slot_index_ = -1;
   load_slot_index_ = -1;
+  x_clock_mode_ = 0;
   
   leds_.Init();
   switches_.Init();
@@ -348,6 +349,25 @@ void Ui::OnSwitchReleased(const Event& e) {
       saveload_confirmed_tick_count_ = 0;
       ignore_release_[SWITCH_T_RANGE] = true;
       mode_ = UI_MODE_NORMAL;
+      ExitAdditionalAlternateKnobMapping();
+      return;
+    }
+    if (e.control_id == SWITCH_X_EXT) {
+      // change x clock mode
+      if (e.data >= kLongPressDuration) {
+        if (x_clock_mode_) {
+          x_clock_mode_ = 0; // normal
+        }
+      } else {
+        if (x_clock_mode_ == 1) {
+          x_clock_mode_ = 2; // t hold
+        } else {
+          x_clock_mode_ = 1; // t reset
+        }
+      }
+      saveload_confirmed_tick_count_ = 0;
+      ignore_release_[SWITCH_X_EXT] = true;
+      mode_ = UI_MODE_SAVELOAD_CONFIRMED;
       ExitAdditionalAlternateKnobMapping();
       return;
     }

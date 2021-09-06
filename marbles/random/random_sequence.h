@@ -321,6 +321,11 @@ class RandomSequence {
     loop_write_head_ = loop_write_head_slot_[slot_index];
   }
 
+  inline void reset_step() {
+    step_ = start_ + length_;
+    // next process() call, step_ will be resetted to start position.
+  }
+
  private:
   RandomStream* random_stream_;
   float loop_[kDejaVuBufferSize];

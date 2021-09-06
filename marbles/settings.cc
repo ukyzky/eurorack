@@ -200,6 +200,7 @@ void Settings::Init() {
   state_.color_blind = 0;
 
   state_.loop_start = 0;
+  state_.x_reset = 0;
   
   freshly_baked_ = !chunk_storage_.Init(&persistent_data_, &state_);
   

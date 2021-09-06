@@ -71,6 +71,8 @@ class SlaveRamp {
       float expected_value) {
     bernoulli_ = true;
 
+    // gate_before_reset_ = false;
+
     if (must_complete_) {
       phase_ = 0.0f;
       pulse_width_ = pulse_width;
@@ -110,8 +112,13 @@ class SlaveRamp {
     *gate = pulse_width_ == 0.0f
         ? pulse_length_ < 32 && output_phase <= 0.5f
         : output_phase < pulse_width_;
+    // gate_before_reset_ = *gate;
     ++pulse_length_;
   }
+
+  // inline bool gate_before_reset() {
+  //   return gate_before_reset_;
+  // }
 
  private:
   float phase_;
@@ -120,6 +127,8 @@ class SlaveRamp {
   float pulse_width_;
   float target_;
   int pulse_length_;
+
+  // bool gate_before_reset_;
 
   bool bernoulli_;
   bool must_complete_;

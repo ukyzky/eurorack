@@ -142,6 +142,8 @@ void TGenerator::Init(RandomStream* random_stream, float sr) {
   phase_difference_ = 0.0f;
   previous_external_ramp_value_ = 0.0f;
 
+  gate_holding_ = false;
+
   divider_pattern_length_ = 0;
   fill(&streak_counter_[0], &streak_counter_[kMarkovHistorySize], 0);
   fill(&markov_history_[0], &markov_history_[kMarkovHistorySize], 0);
@@ -327,7 +329,9 @@ void TGenerator::Process(
     const GateFlags* external_clock,
     Ramps ramps,
     bool* gate,
-    size_t size) {
+    size_t size,
+    const stmlib::GateFlags* external_reset,
+    bool external_hold) {
   float internal_frequency;
   if (use_external_clock) {
     if (!use_external_clock_) {
@@ -371,16 +375,44 @@ void TGenerator::Process(
   }
   
   use_external_clock_ = use_external_clock;
-  
+
   while (size--) {
+    GateFlags flags = GATE_FLAG_LOW;
+    if (external_reset != NULL) {
+      flags = *external_reset++;
+      if (flags == GATE_FLAG_RISING || flags == GATE_FLAG_HIGH) {
+        if (!external_hold) {
+          sequence_.reset_step();
+        } else {
+          gate_holding_ = true;
+          // hold_master_phase_ = master_phase_;
+        }
+        // for (size_t j = 0; j < kNumTChannels; ++j) {
+        //   *gate = slave_ramp_[j].gate_before_reset();
+        //   ramps.slave[j]++;
+        //   gate++;
+        // }
+        // continue;
+      } else if (flags == GATE_FLAG_FALLING || flags == GATE_FLAG_LOW) {
+        if (gate_holding_) {
+          // if (!external_hold) {
+          //   sequence_.reset_step();
+          // }
+          gate_holding_ = false;
+        }
+      }
+    }
+
     float frequency = use_external_clock
         ? *ramps.external - previous_external_ramp_value_
         : internal_frequency;
     frequency += frequency < 0.0f ? 1.0f : 0.0f;
 
     float jittery_frequency = frequency * jitter_multiplier_;
+    if (!gate_holding_) {
     master_phase_ += jittery_frequency;
     phase_difference_ += frequency - jittery_frequency;
+    }
     
     if (master_phase_ > 1.0f) {
       master_phase_ -= 1.0f;

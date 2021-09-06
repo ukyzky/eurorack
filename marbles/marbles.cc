@@ -256,6 +256,7 @@ void Process(IOBuffer::Block* block, size_t size) {
   // Determine the clock source for the XY section (2%)
   ClockSource xy_clock_source = CLOCK_SOURCE_INTERNAL_T1_T2_T3;
   if (block->input_patched[1]) {
+    if (ui.x_clock_mode() == 0) {
     xy_clock_source = CLOCK_SOURCE_EXTERNAL;
     size_t best_score = 8;
     for (size_t i = 0; i < kNumGateOutputs; ++i) {
@@ -264,6 +265,7 @@ void Process(IOBuffer::Block* block, size_t size) {
         xy_clock_source = ClockSource(CLOCK_SOURCE_INTERNAL_T1 + i);
         best_score = score;
       }
+    }
     }
   }
 
@@ -308,12 +310,24 @@ void Process(IOBuffer::Block* block, size_t size) {
   t_generator.set_start(deja_vu_start);
   t_generator.set_pulse_width_mean(float(state.t_pulse_width_mean) / 256.0f);
   t_generator.set_pulse_width_std(float(state.t_pulse_width_std) / 256.0f);
+
+  GateFlags* t_reset = NULL;
+  bool t_hold = false;
+  if (ui.x_clock_mode() != 0) {
+    t_reset = xy_clock;
+    if (ui.x_clock_mode() == 2) {
+      t_hold = true;
+    }
+  }
+
   t_generator.Process(
       block->input_patched[0],
       t_clock,
       ramps,
       gates,
-      size);
+      size,
+      t_reset,
+      t_hold);
         
   // Generate voltages for X-section (40%).
   float note_cv_1 = cv_reader.channel(ADC_CHANNEL_X_SPREAD).scaled_raw_cv();
@@ -391,7 +405,9 @@ void Process(IOBuffer::Block* block, size_t size) {
         xy_clock,
         ramps,
         voltages,
-        size);
+        size,
+        t_reset,
+        t_hold);
   }
   
   const float* v = voltages;

@@ -89,7 +89,9 @@ class TGenerator {
       const stmlib::GateFlags* external_clock,
       Ramps ramps,
       bool* gate,
-      size_t size);
+      size_t size,
+      const stmlib::GateFlags* external_reset,
+      bool external_hold);
   
   inline void set_model(TGeneratorModel model) {
     model_ = model;
@@ -138,7 +140,7 @@ class TGenerator {
   inline void load_slot(int slot_index) {
     sequence_.load_slot(slot_index);
   }
-  
+
  private:
   union RandomVector {
     struct {
@@ -187,6 +189,9 @@ class TGenerator {
   float previous_external_ramp_value_;
   
   bool use_external_clock_;
+
+  bool gate_holding_;
+  // float hold_master_phase_;
 
   int32_t divider_pattern_length_;
   int32_t streak_counter_[kMarkovHistorySize];

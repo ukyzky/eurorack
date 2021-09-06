@@ -47,6 +47,8 @@ void OutputChannel::Init() {
   steps_ = 0.5f;
   scale_index_ = 0;
 
+  gate_holding_ = false;
+
   register_mode_ = false;
   register_value_ = 0.0f;
   register_transposition_ = 0.0f;
@@ -96,7 +98,9 @@ void OutputChannel::Process(
     const float* phase,
     float* output,
     size_t size,
-    size_t stride) {
+    size_t stride,
+    const stmlib::GateFlags* external_reset,
+    bool external_hold) {
   
   ParameterInterpolator steps_modulation(
       &previous_steps_, steps_, size);
@@ -120,7 +124,30 @@ void OutputChannel::Process(
   }
   
   while (size--) {
+    GateFlags flags = GATE_FLAG_LOW;
+    if (external_reset != NULL) {
+      flags = *external_reset++;
+      if (flags == GATE_FLAG_RISING || flags == GATE_FLAG_HIGH) {
+        if (!external_hold) {
+          random_sequence->reset_step();
+        } else {
+          gate_holding_ = true;
+        }
+        // *output = before_reset_voltage_;
+        // output += stride;
+        // continue;
+      } else if (flags == GATE_FLAG_FALLING || flags == GATE_FLAG_LOW) {
+        if (gate_holding_) {
+          // if (!external_hold) {
+          //   random_sequence->reset_step();
+          // }
+          gate_holding_ = false;
+        }
+      }
+    }
+
     const float steps = steps_modulation.Next();
+    if (!gate_holding_) {
     if (*phase < previous_phase_) {
       previous_voltage_ = voltage_;
       voltage_ = GenerateNewVoltage(random_sequence);
@@ -130,6 +157,7 @@ void OutputChannel::Process(
         reacquisition_counter_ = kNumReacquisitions;
       }
     }
+    }
     
     if (steps >= 0.5f) {
       *output = quantized_voltage_;
@@ -137,6 +165,7 @@ void OutputChannel::Process(
       const float smoothness = 1.0f - 2.0f * steps;
       *output = lag_processor_.Process(voltage_, smoothness, *phase);
     }
+    // before_reset_voltage_ = *output;
     output += stride;
     previous_phase_ = *phase++;
   }

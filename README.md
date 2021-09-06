@@ -1,11 +1,16 @@
-# Marbles alternative firmware v03
+# Marbles alternative firmware v04
 
-This firmware adds some functions to Marbles v1.2+ (Jul 4, 2021).
+This firmware adds some functions to Marbles v1.2+.
 
-- save/load loop sequence in volatile memory (RAM).
+- x clock input works as t trigger reset or t gate hold.
 - set loop start position.
+- save/load loop sequence in volatile memory (RAM).
 
 ## Change log
+
+### v04
+
+- Add x clock input alternative mode for t trigger reset and t gate hold.
 
 ### v03
 
@@ -67,6 +72,30 @@ Play scenario is:
   - 4b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in save/load mode.)
   - 4c. turn "loop length knob" to set loop start position.
   - 4d. push "T rate switch". then "T rate LED" stop blink. (It represents save/load mode exited.)
+
+## x clock input for t trigger reset mode or t gate hold mode
+
+We can use x clock input as t trigger rising edge reset mode (x is clocked by internal t).
+
+And we can use x clock input as t gate hold mode (x is clocked by internal t).
+
+Play scenario is:
+
+1. Connect something to x clock input.
+
+2. (NEW FUNCTION) Set x clock input alternative mode
+
+  - In save/load mode, "external button" works as setting x clock input alternative mode.
+
+  - 2a. long-press "T rate switch".
+  - 2b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in save/load mode.)
+  - 2c. push "external switch". then "T rate LED" stop blink. (It represents save/load mode exited.) Then x clock input works as t trigger rising edge reset mode.
+
+  - Repeat 2a, 2b and 2c. Then x clock input works as t gate hold mode.
+
+  - 2d. long-press "T rate switch".
+  - 2e. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in save/load mode.)
+  - 2f. long-press "external switch". then "T rate LED" stop blink. (It represents save/load mode exited.) Then x clock input works as normal x clock mode.
 
 =======
 

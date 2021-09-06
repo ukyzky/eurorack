@@ -130,6 +130,10 @@ class Ui {
     load_slot_index_ = -1;
   }
 
+  int x_clock_mode() const {
+    return x_clock_mode_;
+  }
+
  private:
   void UpdateLEDs();
   void OnSwitchPressed(const stmlib::Event& e);
@@ -176,6 +180,9 @@ class Ui {
   uint16_t saveload_confirmed_tick_count_;
 
   bool additional_alternate_knob_mapping_mode_;
+
+  // x clock mode (0: normal xy_clock mode, 1: t trigger rising edge reset mode, 2: t gate hold mode)
+  int x_clock_mode_;
   
   DISALLOW_COPY_AND_ASSIGN(Ui);
 };

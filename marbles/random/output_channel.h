@@ -30,6 +30,7 @@
 #define MARBLES_RANDOM_OUTPUT_CHANNEL_H_
 
 #include "stmlib/stmlib.h"
+#include "stmlib/utils/gate_flags.h"
 
 #include "marbles/random/lag_processor.h"
 #include "marbles/random/quantizer.h"
@@ -67,7 +68,9 @@ class OutputChannel {
       const float* phase,
       float* output,
       size_t size,
-      size_t stride);
+      size_t stride,
+      const stmlib::GateFlags* external_reset,
+      bool external_hold);
 
   inline void set_spread(float spread) {
     spread_ = spread;
@@ -113,6 +116,9 @@ class OutputChannel {
   float steps_;
   int scale_index_;
   
+  bool gate_holding_;
+  // float before_reset_voltage_;
+
   bool register_mode_;
   float register_value_;
   float register_transposition_;

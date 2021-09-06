@@ -97,7 +97,9 @@ class XYGenerator {
       const stmlib::GateFlags* external_clock,
       const Ramps& ramps,
       float* output,
-      size_t size);
+      size_t size,
+      const stmlib::GateFlags* external_reset,
+      bool external_hold);
   
   void LoadScale(int channel, int scale_index, const Scale& scale) {
     output_channel_[channel].LoadScale(scale_index, scale);
