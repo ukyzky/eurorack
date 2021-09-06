@@ -2,7 +2,7 @@
 
 This firmware adds some functions to Marbles v1.2+.
 
-- x clock input works as t trigger reset or t gate hold.
+- X external clock input can work as T trigger reset or T gate hold.
 - set loop start position.
 - save/load loop sequence in volatile memory (RAM).
 
@@ -10,7 +10,7 @@ This firmware adds some functions to Marbles v1.2+.
 
 ### v04
 
-- Add x clock input alternative mode for t trigger reset and t gate hold.
+- Add X external clock input alternative mode for T trigger reset and T gate hold.
 
 ### v03
 
@@ -29,21 +29,19 @@ This firmware adds some functions to Marbles v1.2+.
 
 ## Save/Load loop sequence in volatile memory (RAM)
 
-We can explore vast sea of random rhythm and return to the previous discovered precious random rhythm.
-
-It's useful for live performance.
+We can explore random rhythm and return to the previous discovered  random rhythm.
 
 Play scenario is:
 
-1. Explore great random rhythm by changing "deja vu knob" with deja vu enabled.
-2. Lock the great rhythm by setting "deja vu knob" to 50%(12 o'clock).
+1. Explore random rhythm.
+2. Lock the rhythm by setting "deja vu knob" to 50%(12 o'clock) with deja vu enabled.
 3. (NEW FUNCTION) Save the rhythm
   - 3a. long-press "T rate switch".
   - 3b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in save/load mode.)
   - 3c. then press "T deja vu switch".
   - 3d. then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents saving is executed.)
-4. Explore another great random rhythm by changing "deja vu knob".
-5. Lock the great rhythm by setting "deja vu knob" to 50%.
+4. Explore another random rhythm by changing "deja vu knob" or switching deja vu enabled-disabled.
+5. Lock the rhythm by setting "deja vu knob" to 50% with deja vu enabled.
 6. (NEW FUNCTION) Load the previous rhythm
   - 6a. long-press "T rate switch".
   - 6b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in save/load mode.)
@@ -54,48 +52,57 @@ Play scenario is:
 
 ## Set loop start position
 
-We can select short length loop patterns from precious random rhythm.
+We can select short length loop patterns from locked random rhythm.
 
-It's useful for live performance.
+The loop start position setting is saved to volatile memory (RAM).
 
 Play scenario is:
 
-1. Explore great random rhythm by changing "deja vu knob" with deja vu enabled.
-2. Lock the great rhythm by setting "deja vu knob" to 50%(12 o'clock).
+1. Explore random rhythm.
+2. Lock the rhythm by setting "deja vu knob" to 50%(12 o'clock) with deja vu enabled.
 3. Set deja vu loop length using "loop length knob".
 
 4. (NEW FUNCTION) Set deja vu loop start position
 
-  - In save/load mode, "loop length knob" works as setting loop start position.
+  - (In save/load mode, "loop length knob" works as setting loop start position.)
 
   - 4a. long-press "T rate switch".
   - 4b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in save/load mode.)
   - 4c. turn "loop length knob" to set loop start position.
-  - 4d. push "T rate switch". then "T rate LED" stop blink. (It represents save/load mode exited.)
+  - 4d. push "T rate switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents save/load mode exited.)
 
-## x clock input for t trigger reset mode or t gate hold mode
+## X external clock input alternative mode
 
-We can use x clock input as t trigger rising edge reset mode (x is clocked by internal t).
+We can use X external clock input as T trigger rising edge reset mode (x is clocked by internal t clock).
 
-And we can use x clock input as t gate hold mode (x is clocked by internal t).
+And we can use X external clock input as T gate hold mode (x is clocked by internal t clock).
+
+The X external clock input mode setting is saved to volatile memory (RAM).
 
 Play scenario is:
 
-1. Connect something to x clock input.
+1. Connect something to X external clock input jack. (It's important.)
 
-2. (NEW FUNCTION) Set x clock input alternative mode
+2. (NEW FUNCTION) Set X external clock input alternative mode
 
-  - In save/load mode, "external button" works as setting x clock input alternative mode.
+  - In save/load mode, "external processing switch" works as setting X external clock input alternative mode.
 
   - 2a. long-press "T rate switch".
   - 2b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in save/load mode.)
-  - 2c. push "external switch". then "T rate LED" stop blink. (It represents save/load mode exited.) Then x clock input works as t trigger rising edge reset mode.
+  - 2c. push "external processing switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents save/load mode exited.)
+  - Then X external clock input works as T trigger rising edge reset mode. When trigger/gate rising edge signal detected at X external clock input, internal T and X sequence are resetted.
 
-  - Repeat 2a, 2b and 2c. Then x clock input works as t gate hold mode.
+  - Repeat above 2a, 2b and 2c.
+  - Then X external clock input works as T gate hold mode. During trigger/gate ON signal at X external clock input, internal T and X sequence are holded (in another word, pause and resume behavior).
 
-  - 2d. long-press "T rate switch".
-  - 2e. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in save/load mode.)
-  - 2f. long-press "external switch". then "T rate LED" stop blink. (It represents save/load mode exited.) Then x clock input works as normal x clock mode.
+  - Each repeating above 2a, 2b and 2c, X external clock input mode changes to T trigger rising edge reset mode or T gate hold mode.
+
+3. (NEW FUNCTION) Set X external clock input normal mode
+
+  - 3a. long-press "T rate switch".
+  - 3b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in save/load mode.)
+  - 3c. long-press "external processing switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents save/load mode exited.)
+  - Then X external clock input works as normal X external clock mode.
 
 =======
 
