@@ -69,7 +69,6 @@ void Ui::Init(
 
   save_slot_index_ = -1;
   load_slot_index_ = -1;
-  x_clock_mode_ = 0;
   
   leds_.Init();
   switches_.Init();
@@ -321,6 +320,8 @@ void Ui::OnSwitchReleased(const Event& e) {
     return;
   }
 
+  State* state = settings_->mutable_state();
+
   if (mode_ == UI_MODE_SAVELOAD) {
     if (e.control_id == SWITCH_T_DEJA_VU) {
       // save slot A
@@ -355,14 +356,14 @@ void Ui::OnSwitchReleased(const Event& e) {
     if (e.control_id == SWITCH_X_EXT) {
       // change x clock mode
       if (e.data >= kLongPressDuration) {
-        if (x_clock_mode_) {
-          x_clock_mode_ = 0; // normal
+        if (state->x_clock_mode) {
+          state->x_clock_mode = 0; // normal
         }
       } else {
-        if (x_clock_mode_ == 1) {
-          x_clock_mode_ = 2; // t hold
+        if (state->x_clock_mode == 1) {
+          state->x_clock_mode = 2; // t hold
         } else {
-          x_clock_mode_ = 1; // t reset
+          state->x_clock_mode = 1; // t reset
         }
       }
       saveload_confirmed_tick_count_ = 0;
@@ -373,7 +374,6 @@ void Ui::OnSwitchReleased(const Event& e) {
     }
   }
   
-  State* state = settings_->mutable_state();
   switch (e.control_id) {
     case SWITCH_T_DEJA_VU:
       if (state->t_deja_vu == DEJA_VU_OFF) {

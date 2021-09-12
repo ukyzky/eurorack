@@ -252,11 +252,13 @@ void Process(IOBuffer::Block* block, size_t size) {
   
   GateFlags* t_clock = block->input[0];
   GateFlags* xy_clock = block->input[1];
-  
+
+  const State& state = settings.state();
+
   // Determine the clock source for the XY section (2%)
   ClockSource xy_clock_source = CLOCK_SOURCE_INTERNAL_T1_T2_T3;
   if (block->input_patched[1]) {
-    if (ui.x_clock_mode() == 0) {
+    if (state.x_clock_mode == 0) {
     xy_clock_source = CLOCK_SOURCE_EXTERNAL;
     size_t best_score = 8;
     for (size_t i = 0; i < kNumGateOutputs; ++i) {
@@ -286,7 +288,6 @@ void Process(IOBuffer::Block* block, size_t size) {
   ramps.slave[0] = &ramp_buffer[kBlockSize * 2];
   ramps.slave[1] = &ramp_buffer[kBlockSize * 3];
   
-  const State& state = settings.state();
   int deja_vu_length = deja_vu_length_quantizer.Lookup(
       loop_length,
       parameters[ADC_CHANNEL_DEJA_VU_LENGTH],
@@ -313,9 +314,9 @@ void Process(IOBuffer::Block* block, size_t size) {
 
   GateFlags* t_reset = NULL;
   bool t_hold = false;
-  if (ui.x_clock_mode() != 0) {
+  if (state.x_clock_mode != 0) {
     t_reset = xy_clock;
-    if (ui.x_clock_mode() == 2) {
+    if (state.x_clock_mode == 2) {
       t_hold = true;
     }
   }
