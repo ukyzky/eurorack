@@ -201,6 +201,7 @@ void Settings::Init() {
 
   state_.loop_start = 0;
   state_.x_clock_mode = 0;
+  state_.quantizer_cv_mode = 0;
   
   freshly_baked_ = !chunk_storage_.Init(&persistent_data_, &state_);
   
@@ -214,6 +215,7 @@ void Settings::Init() {
     CONSTRAIN(state_.t_deja_vu, DEJA_VU_OFF, DEJA_VU_LOCKED);
     CONSTRAIN(state_.x_deja_vu, DEJA_VU_OFF, DEJA_VU_LOCKED);
     CONSTRAIN(state_.x_clock_mode, 0, 2);
+    CONSTRAIN(state_.quantizer_cv_mode, 0, 1);
     
     CalibrationData& c = persistent_data_.calibration_data;
     for (size_t i = 0; i < ADC_CHANNEL_LAST; ++i) {

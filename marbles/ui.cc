@@ -372,6 +372,23 @@ void Ui::OnSwitchReleased(const Event& e) {
       ExitAdditionalAlternateKnobMapping();
       return;
     }
+    if (e.control_id == SWITCH_X_RANGE) {
+      // change quantizer cv mode
+      if (e.data >= kLongPressDuration) {
+        if (state->quantizer_cv_mode) {
+          state->quantizer_cv_mode = 0; // normal t jitter cv
+        }
+      } else {
+        if (state->quantizer_cv_mode == 0) {
+          state->quantizer_cv_mode = 1; // x quantizer select cv
+        }
+      }
+      saveload_confirmed_tick_count_ = 0;
+      ignore_release_[SWITCH_X_RANGE] = true;
+      mode_ = UI_MODE_SAVELOAD_CONFIRMED;
+      ExitAdditionalAlternateKnobMapping();
+      return;
+    }
   }
   
   switch (e.control_id) {

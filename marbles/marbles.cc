@@ -192,6 +192,15 @@ Ratio y_divider_ratios[] = {
   { 1, 1 },
 };
 
+int quantizer_cv_table[] = {
+  0, 0, 0,
+  1, 1, 1, 1, 1, 1,
+  2, 2, 2, 2, 2, 2,
+  3, 3, 3, 3, 3, 3,
+  4, 4, 4, 4, 4, 4,
+  5, 5, 5
+};
+
 int loop_length[] = {
   1,
   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
@@ -302,7 +311,11 @@ void Process(IOBuffer::Block* block, size_t size) {
   t_generator.set_range(TGeneratorRange(state.t_range));
   t_generator.set_rate(parameters[ADC_CHANNEL_T_RATE]);
   t_generator.set_bias(parameters[ADC_CHANNEL_T_BIAS]);
+  if (state.quantizer_cv_mode == 0) {
   t_generator.set_jitter(parameters[ADC_CHANNEL_T_JITTER]);
+  } else {
+    t_generator.set_jitter(cv_reader.channel(ADC_CHANNEL_T_JITTER).pot());
+  }
   t_generator.set_deja_vu(
       state.t_deja_vu == DEJA_VU_LOCKED
           ? 0.5f
@@ -397,7 +410,15 @@ void Process(IOBuffer::Block* block, size_t size) {
       settings.set_dirty_scale_index(-1);
     }
     
+    if (state.quantizer_cv_mode == 0) {
     y.scale_index = x.scale_index = state.x_scale;
+    } else {
+      int scale_index = deja_vu_length_quantizer.Lookup(
+        quantizer_cv_table,
+        cv_reader.channel(ADC_CHANNEL_T_JITTER).cv(),
+        sizeof(quantizer_cv_table) / sizeof(int));
+      y.scale_index = x.scale_index = scale_index;
+    }
 
     xy_generator.Process(
         xy_clock_source,
