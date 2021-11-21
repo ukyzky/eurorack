@@ -14,7 +14,7 @@ This firmware adds some functions to Marbles v1.2+.
 
 - Add X spread cv input alternative mode for X quantizer root select.
 - Add resetting operation for returning all alternative settings value to default value.
-- alternative mode settings immediately saved on exitting alternative setting edit mode.
+- alternative mode settings immediately saved on exiting alternative setting edit mode.
 
 ### v05
 
@@ -206,10 +206,7 @@ After long-press "T rate switch" ("T rate LED" is blinking), for canceling "alte
 
 ### Save timing of alternative mode setting
 
-For Saving alternative mode setting (loop start position, X external clock input mode and T jitter cv input mode) to non volatile memory,
-please press "T mode swith" or "T range switch" or "X mode switch" or "X range switch" after setting alternative mode edit done.
-
-It's the same behavior as normal Marbles firmware.
+Saving alternative mode setting (loop start position, X external clock input mode, T jitter cv input mode, X spread cv input mode) to non volatile memory will be done automatically when exiting alternative setting edit mode.
 
 =======
 
