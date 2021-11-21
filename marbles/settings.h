@@ -86,10 +86,12 @@ struct State {
   uint8_t loop_start;
   // x clock mode (0: normal xy_clock mode, 1: t trigger rising edge reset mode, 2: t gate hold mode)
   uint8_t x_clock_mode;
-  // quantizer cv mode (0: normal t jitter cv input mode, 1: x quantizer select cv input mode)
+  // quantizer scale cv mode (0: normal t jitter cv input mode, 1: x quantizer scale select cv input mode)
   uint8_t quantizer_cv_mode;
+  // quantizer root cv mode (0: normal x range cv input mode, 1: x quantizer adding root offset 1v/oct cv input mode 2: x quantizer reflecting root 1v/oct cv input mode)
+  uint8_t root_cv_mode;
 
-  uint8_t padding[5];
+  uint8_t padding[4];
 
   enum { tag = 0x54415453 };
 };

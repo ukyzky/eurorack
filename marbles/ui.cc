@@ -349,8 +349,20 @@ void Ui::OnSwitchReleased(const Event& e) {
       load_slot_index_ = -1;
       saveload_confirmed_tick_count_ = 0;
       ignore_release_[SWITCH_T_RANGE] = true;
-      mode_ = UI_MODE_NORMAL;
+      if (e.data >= kLongPressDuration) {
+        // all reset of alternate function settings
+        state->loop_start = 0;
+        state->x_clock_mode = 0; // normal
+        state->quantizer_cv_mode = 0; // normal t jitter cv
+        state->root_cv_mode = 0; // normal x range cv
+        mode_ = UI_MODE_SAVELOAD_CONFIRMED;
+      } else {
+        mode_ = UI_MODE_NORMAL;
+      }
       ExitAdditionalAlternateKnobMapping();
+      if (e.data >= kLongPressDuration) {
+        SaveState();
+      }
       return;
     }
     if (e.control_id == SWITCH_X_EXT) {
@@ -370,23 +382,45 @@ void Ui::OnSwitchReleased(const Event& e) {
       ignore_release_[SWITCH_X_EXT] = true;
       mode_ = UI_MODE_SAVELOAD_CONFIRMED;
       ExitAdditionalAlternateKnobMapping();
+      SaveState();
       return;
     }
     if (e.control_id == SWITCH_X_RANGE) {
-      // change quantizer cv mode
+      // change quantizer scale cv mode
       if (e.data >= kLongPressDuration) {
         if (state->quantizer_cv_mode) {
           state->quantizer_cv_mode = 0; // normal t jitter cv
         }
       } else {
         if (state->quantizer_cv_mode == 0) {
-          state->quantizer_cv_mode = 1; // x quantizer select cv
+          state->quantizer_cv_mode = 1; // x quantizer scale select cv
         }
       }
       saveload_confirmed_tick_count_ = 0;
       ignore_release_[SWITCH_X_RANGE] = true;
       mode_ = UI_MODE_SAVELOAD_CONFIRMED;
       ExitAdditionalAlternateKnobMapping();
+      SaveState();
+      return;
+    }
+    if (e.control_id == SWITCH_X_MODE) {
+      // change quantizer root cv mode
+      if (e.data >= kLongPressDuration) {
+        if (state->root_cv_mode) {
+          state->root_cv_mode = 0; // normal x range cv
+        }
+      } else {
+        if (state->root_cv_mode == 1) {
+          state->root_cv_mode = 2; // x quantizer reflecting root 1v/oct cv
+        } else {
+          state->root_cv_mode = 1; // x quantizer adding root offset 1v/oct cv
+        }
+      }
+      saveload_confirmed_tick_count_ = 0;
+      ignore_release_[SWITCH_X_MODE] = true;
+      mode_ = UI_MODE_SAVELOAD_CONFIRMED;
+      ExitAdditionalAlternateKnobMapping();
+      SaveState();
       return;
     }
   }

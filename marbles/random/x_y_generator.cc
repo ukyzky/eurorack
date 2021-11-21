@@ -158,6 +158,7 @@ void XYGenerator::Process(
     channel.set_scale_index(settings.scale_index);
     channel.set_register_mode(settings.register_mode);
     channel.set_register_value(settings.register_value);
+    channel.set_root_mode(settings.root_mode);
     channel.set_register_transposition(
         4.0f * settings.spread * (settings.bias - 0.5f) * amount);
     

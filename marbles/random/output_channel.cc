@@ -70,12 +70,14 @@ void OutputChannel::Init() {
   for (int i = 0; i < 6; ++i) {
     quantizer_[i].Init(scale);
   }
+
+  root_mode_ = 0;
 }
 
 float OutputChannel::GenerateNewVoltage(RandomSequence* random_sequence) {
-  float u = random_sequence->NextValue(register_mode_, register_value_);
+  float u = random_sequence->NextValue(register_mode_ && (root_mode_ == 0), register_value_);
   
-  if (register_mode_) {
+  if (register_mode_ && (root_mode_ == 0)) {
     return 10.0f * (u - 0.5f) + register_transposition_;
   } else {
     float degenerate_amount = 1.25f - spread_ * 25.0f;
@@ -120,7 +122,13 @@ void OutputChannel::Process(
     --reacquisition_counter_;
     float u = random_sequence->RewriteValue(register_value_);
     voltage_ = 10.0f * (u - 0.5f) + register_transposition_;
+    if (root_mode_ == 1) {
+      quantized_voltage_ = QuantizeEx(voltage_, 2.0f * steps_ - 1.0f, register_value_);
+    } else if (root_mode_ == 2) {
+      quantized_voltage_ = QuantizeEx2(voltage_, 2.0f * steps_ - 1.0f, register_value_);
+    } else {
     quantized_voltage_ = Quantize(voltage_, 2.0f * steps_ - 1.0f);
+    }
   }
   
   while (size--) {
@@ -152,7 +160,13 @@ void OutputChannel::Process(
       previous_voltage_ = voltage_;
       voltage_ = GenerateNewVoltage(random_sequence);
       lag_processor_.ResetRamp();
+      if (root_mode_ == 1) {
+        quantized_voltage_ = QuantizeEx(voltage_, 2.0f * steps - 1.0f, register_value_);
+      } else if (root_mode_ == 2) {
+        quantized_voltage_ = QuantizeEx2(voltage_, 2.0f * steps - 1.0f, register_value_);
+      } else {
       quantized_voltage_ = Quantize(voltage_, 2.0f * steps - 1.0f);
+      }
       if (register_mode_) {
         reacquisition_counter_ = kNumReacquisitions;
       }
@@ -169,6 +183,19 @@ void OutputChannel::Process(
     output += stride;
     previous_phase_ = *phase++;
   }
+}
+
+float OutputChannel::QuantizeEx(float voltage, float amount, float root) {
+  float voltageProcess = quantizer_[scale_index_].Process(voltage, amount, false);
+  return voltageProcess + root * 10.0f - 5.0f;
+}
+
+float OutputChannel::QuantizeEx2(float voltage, float amount, float root) {
+  float newRoot = root * 10.0f - 5.0f;
+  int voltageInt = floor(newRoot);
+  float voltageOffset = newRoot - voltageInt;
+  float voltageProcess = quantizer_[scale_index_].Process(voltage - voltageOffset, amount, false);
+  return voltageProcess + voltageOffset;
 }
 
 }  // namespace marbles

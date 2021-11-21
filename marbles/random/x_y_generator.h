@@ -82,6 +82,7 @@ struct GroupSettings {
   int length;
   Ratio ratio;
   int start;
+  int root_mode;
 };
 
 class XYGenerator {

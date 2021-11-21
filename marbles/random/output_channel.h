@@ -72,6 +72,9 @@ class OutputChannel {
       const stmlib::GateFlags* external_reset,
       bool external_hold);
 
+  float QuantizeEx(float voltage, float amount, float root);
+  float QuantizeEx2(float voltage, float amount, float root);
+
   inline void set_spread(float spread) {
     spread_ = spread;
   }
@@ -108,6 +111,10 @@ class OutputChannel {
     return quantizer_[scale_index_].Process(voltage, amount, false);
   }
   
+  inline void set_root_mode(int root_mode) {
+    root_mode_ = root_mode;
+  }
+
  private:
   float GenerateNewVoltage(RandomSequence* random_sequence);
   
@@ -136,6 +143,8 @@ class OutputChannel {
   LagProcessor lag_processor_;
   
   Quantizer quantizer_[6];
+
+  int root_mode_;
   
   DISALLOW_COPY_AND_ASSIGN(OutputChannel);
 };

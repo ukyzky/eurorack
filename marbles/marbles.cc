@@ -376,11 +376,16 @@ void Process(IOBuffer::Block* block, size_t size) {
     x.control_mode = ControlMode(state.x_control_mode);
     x.voltage_range = VoltageRange(state.x_range % 3);
     x.register_mode = state.x_register_mode;
+    x.root_mode = state.root_cv_mode;
     x.register_value = u;
     cv_reader.set_attenuverter(
-        ADC_CHANNEL_X_SPREAD, state.x_register_mode ? 0.5f : 1.0f);
+        ADC_CHANNEL_X_SPREAD, state.x_register_mode || state.root_cv_mode ? 0.5f : 1.0f);
   
+    if (state.root_cv_mode == 0) {
     x.spread = parameters[ADC_CHANNEL_X_SPREAD];
+    } else {
+      x.spread = cv_reader.channel(ADC_CHANNEL_X_SPREAD).pot();
+    }
     x.bias = parameters[ADC_CHANNEL_X_BIAS];
     x.steps = parameters[ADC_CHANNEL_X_STEPS];
     x.deja_vu = state.x_deja_vu == DEJA_VU_LOCKED
@@ -394,6 +399,7 @@ void Process(IOBuffer::Block* block, size_t size) {
     y.control_mode = CONTROL_MODE_IDENTICAL;
     y.voltage_range = VoltageRange(state.y_range);
     y.register_mode = false;
+    y.root_mode = 0;
     y.register_value = 0.0f;
     y.spread = float(state.y_spread) / 256.0f;
     y.bias = float(state.y_bias) / 256.0f;
