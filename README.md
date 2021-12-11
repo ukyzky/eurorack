@@ -1,7 +1,8 @@
-# Marbles alternative firmware v06
+# Marbles alternative firmware v07
 
 This firmware adds some functions to Marbles v1.2+.
 
+- activate new (hidden) Markov algorithm of T mode.
 - X spread cv input can work as X quantizer root select (two alternative modes).
 - T jitter cv input can work as X quantizer scale slot select.
 - X external clock input can work as T trigger reset or T gate hold.
@@ -9,6 +10,10 @@ This firmware adds some functions to Marbles v1.2+.
 - save/load loop sequence in volatile memory (RAM).
 
 ## Change log
+
+### v07
+
+- Activate hidden Markov algorithm of T mode.
 
 ### v06
 
@@ -188,6 +193,25 @@ Play scenario is:
   - 2b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
   - 2c. long-press "X mode switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
   - Then X spread cv input works as normal X spread cv input mode.
+
+## Activate Markov algorithm of T mode
+
+We can select "Markov algorithm" of T mode.
+
+The T mode setting is saved to non volatile memory.
+
+Play scenario is:
+
+1. (NEW FUNCTION) Set Markov algorithm of T mode
+
+  - 1a. **hold "T mode switch"**
+  - 1b. press "T rate switch"
+  - Then T mode becomes Markov algorithm. During Markov algorithm mode, T mode LED blinks faster with red color.
+
+2. Unset Markov algorithm of T mode
+
+  - 2a. press or long-press "T mode switch".
+  - Then T mode becomes normal "drum algorithm" or "three state algorithm".
 
 ## resetting operation for returning all alternative settings value to default value
 
