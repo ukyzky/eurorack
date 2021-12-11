@@ -207,7 +207,7 @@ void Settings::Init() {
   freshly_baked_ = !chunk_storage_.Init(&persistent_data_, &state_);
   
   if (!freshly_baked_) {
-    CONSTRAIN(state_.t_model, 0, 5);
+    CONSTRAIN(state_.t_model, 0, 6); // 0-5: normal, 6: markov
     CONSTRAIN(state_.t_range, 0, 2);
     CONSTRAIN(state_.x_control_mode, 0, 2);
     CONSTRAIN(state_.x_range, 0, 2);
