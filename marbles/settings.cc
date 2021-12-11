@@ -203,6 +203,7 @@ void Settings::Init() {
   state_.x_clock_mode = 0;
   state_.quantizer_cv_mode = 0;
   state_.root_cv_mode = 0;
+  state_.loop_cv_mode = 0;
   
   freshly_baked_ = !chunk_storage_.Init(&persistent_data_, &state_);
   
@@ -218,6 +219,7 @@ void Settings::Init() {
     CONSTRAIN(state_.x_clock_mode, 0, 2);
     CONSTRAIN(state_.quantizer_cv_mode, 0, 1);
     CONSTRAIN(state_.root_cv_mode, 0, 2);
+    CONSTRAIN(state_.loop_cv_mode, 0, 2);
     
     CalibrationData& c = persistent_data_.calibration_data;
     for (size_t i = 0; i < ADC_CHANNEL_LAST; ++i) {

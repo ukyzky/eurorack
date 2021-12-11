@@ -386,6 +386,7 @@ void Ui::OnSwitchReleased(const Event& e) {
         state->x_clock_mode = 0; // normal
         state->quantizer_cv_mode = 0; // normal t jitter cv
         state->root_cv_mode = 0; // normal x range cv
+        state->loop_cv_mode = 0; // normal t rate cv
         mode_ = UI_MODE_SAVELOAD_CONFIRMED;
       } else {
         mode_ = UI_MODE_NORMAL;
@@ -449,6 +450,26 @@ void Ui::OnSwitchReleased(const Event& e) {
       }
       saveload_confirmed_tick_count_ = 0;
       ignore_release_[SWITCH_X_MODE] = true;
+      mode_ = UI_MODE_SAVELOAD_CONFIRMED;
+      ExitAdditionalAlternateKnobMapping();
+      SaveState();
+      return;
+    }
+    if (e.control_id == SWITCH_T_MODEL) {
+      // change loop cv mode
+      if (e.data >= kLongPressDuration) {
+        if (state->loop_cv_mode) {
+          state->loop_cv_mode = 0; // normal t rate cv
+        }
+      } else {
+        if (state->loop_cv_mode == 1) {
+          state->loop_cv_mode = 2; // loop start position cv
+        } else {
+          state->loop_cv_mode = 1; // loop length cv
+        }
+      }
+      saveload_confirmed_tick_count_ = 0;
+      ignore_release_[SWITCH_T_MODEL] = true;
       mode_ = UI_MODE_SAVELOAD_CONFIRMED;
       ExitAdditionalAlternateKnobMapping();
       SaveState();

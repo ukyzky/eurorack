@@ -215,6 +215,24 @@ int loop_length[] = {
   14,
   16
 };
+int loop_length_cv[] = {
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16
+};
 float parameters[kNumParameters];
 float ramp_buffer[kBlockSize * 4];
 bool gates[kBlockSize * 2];
@@ -297,19 +315,47 @@ void Process(IOBuffer::Block* block, size_t size) {
   ramps.slave[0] = &ramp_buffer[kBlockSize * 2];
   ramps.slave[1] = &ramp_buffer[kBlockSize * 3];
   
-  int deja_vu_length = deja_vu_length_quantizer.Lookup(
+  int deja_vu_length;
+  int deja_vu_start;
+  if (state.loop_cv_mode == 2) { // loop start position cv
+    deja_vu_length = deja_vu_length_quantizer.Lookup(
       loop_length,
       parameters[ADC_CHANNEL_DEJA_VU_LENGTH],
       sizeof(loop_length) / sizeof(int));
 
-  int deja_vu_start = deja_vu_length_quantizer.Lookup(
+    deja_vu_start = deja_vu_length_quantizer.Lookup(
+      loop_length_cv,
+      cv_reader.channel(ADC_CHANNEL_T_RATE).scaled_raw_cv() / 60.0f, // ignore deja vu length knob in alternative mode
+      sizeof(loop_length_cv) / sizeof(int));
+  } else if (state.loop_cv_mode == 1) { // loop length cv
+    deja_vu_length = deja_vu_length_quantizer.Lookup(
+      loop_length_cv,
+      cv_reader.channel(ADC_CHANNEL_T_RATE).scaled_raw_cv() / 60.0f,
+      sizeof(loop_length_cv) / sizeof(int));
+
+    deja_vu_start = deja_vu_length_quantizer.Lookup(
+      loop_length_cv,
+      parameters[ADC_CHANNEL_DEJA_VU_LENGTH], // deja vu length knob act as deja vu start position (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16) knob
+      sizeof(loop_length_cv) / sizeof(int));
+  } else { // normal t rate cv
+    deja_vu_length = deja_vu_length_quantizer.Lookup(
+      loop_length,
+      parameters[ADC_CHANNEL_DEJA_VU_LENGTH],
+      sizeof(loop_length) / sizeof(int));
+
+    deja_vu_start = deja_vu_length_quantizer.Lookup(
       loop_length,
       state.loop_start / 255.f,
       sizeof(loop_length) / sizeof(int));
+  }
 
   t_generator.set_model(TGeneratorModel(state.t_model));
   t_generator.set_range(TGeneratorRange(state.t_range));
+  if (state.loop_cv_mode == 0) {
   t_generator.set_rate(parameters[ADC_CHANNEL_T_RATE]);
+  } else {
+    t_generator.set_rate(cv_reader.channel(ADC_CHANNEL_T_RATE).pot());
+  }
   t_generator.set_bias(parameters[ADC_CHANNEL_T_BIAS]);
   if (state.quantizer_cv_mode == 0) {
   t_generator.set_jitter(parameters[ADC_CHANNEL_T_JITTER]);
