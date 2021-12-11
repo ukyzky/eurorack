@@ -84,51 +84,40 @@ It will be removed at next alternative firmware release.
 
 - Add function of save/load loop sequence.
 
-## Save/Load loop sequence in volatile memory (RAM)
+## Loop length cv (using T rate cv input)
 
-We can explore random rhythm and return to the previous discovered  random rhythm.
+We can use T rate cv input as selecting deja vu loop length or start position.
 
-Play scenario is:
+The cv range is from 0V to 5V. The cv value is reflected to deja vu loop value linearly (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16).
 
-1. Explore random rhythm.
-2. Lock the rhythm by setting "deja vu knob" to 50%(12 o'clock) with deja vu enabled.
-3. (NEW FUNCTION) Save the rhythm
-  - 3a. long-press "T rate switch".
-  - 3b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
-  - 3c. then press "T deja vu switch".
-  - 3d. then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents saving is executed and "alternative setting edit" mode exited.)
-4. Explore another random rhythm by changing "deja vu knob" or switching deja vu enabled-disabled.
-5. Lock the rhythm by setting "deja vu knob" to 50% with deja vu enabled.
-6. (NEW FUNCTION) Load the previous rhythm
-  - 6a. long-press "T rate switch".
-  - 6b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
-  - 6c. then press "X deja vu switch".
-  - 6d. then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents loading is executed and "alternative setting edit" mode exited.)
+During deja vu loop cv input mode, T rate setting is set by T rate knob.
 
-## Set loop start position
-
-(Deprecated. It will be removed at next firmware release.)
-
-We can select short length loop patterns from locked random rhythm.
-
-The loop start position setting is saved to non volatile memory.
+The deja vu loop cv input mode setting is saved to non volatile memory.
 
 Play scenario is:
 
-1. Explore random rhythm.
-2. Lock the rhythm by setting "deja vu knob" to 50%(12 o'clock) with deja vu enabled.
-3. Set deja vu loop length using "loop length knob".
+1. (NEW FUNCTION) Set T rate cv input alternative mode
 
-4. (NEW FUNCTION) Set deja vu loop start position
+  - (In "alternative setting edit" mode, "T mode switch" works as setting T rate cv input alternative mode.)
 
-  - (In "alternative setting edit" mode, "loop length knob" works as setting loop start position.)
+  - 1a. long-press "T rate switch".
+  - 1b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
+  - 1c. push "T mode switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
+  - T rate cv input works as deja vu loop length cv mode (Type A). In this mode, deja vu knob act as deja vu loop start position (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16) knob. This loop start position value is active only in this mode.
 
-  - 4a. long-press "T rate switch".
-  - 4b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
-  - 4c. turn "loop length knob" to set loop start position.
-  - 4d. push "T rate switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
+>  - Repeat above 1a, 1b and 1c.
+>  - T rate cv input works as deja vu loop start position cv mode (Type B). In this mode, deja vu knob act as no functional.
+>
+>  - Each repeating above 1a, 1b and 1c, T rate cv mode changes to Type A or Type B.
 
-## X external clock input alternative mode
+2. Set T rate cv input normal mode
+
+  - 2a. long-press "T rate switch".
+  - 2b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
+  - 2c. long-press "T mode switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
+  - T rate cv input works as normal T rate cv input mode.
+
+## T trigger reset (using X external clock input)
 
 We can use X external clock input as T trigger rising edge reset mode (x is clocked by internal t clock).
 
@@ -165,7 +154,7 @@ Play scenario is:
   - 3c. long-press "external processing switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
   - X external clock input works as normal X external clock mode.
 
-## T jitter cv input alternative mode
+## X Quantizer scale select cv (using T jitter cv input)
 
 We can use T jitter cv input as selecting X quantizer scale slot.
 
@@ -204,7 +193,7 @@ Play scenario is:
   - 2c. long-press "X range switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
   - T jitter cv input works as normal T jitter cv input mode.
 
-## X spread cv input alternative mode
+## X Quantizer root cv (using X spread cv input)
 
 We can use X spread cv input as selecting X quantizer root.
 
@@ -235,6 +224,27 @@ Play scenario is:
   - 2c. long-press "X mode switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
   - X spread cv input works as normal X spread cv input mode.
 
+## Save/Load loop sequence in volatile memory (RAM)
+
+We can explore random rhythm and return to the previous discovered  random rhythm.
+
+Play scenario is:
+
+1. Explore random rhythm.
+2. Lock the rhythm by setting "deja vu knob" to 50%(12 o'clock) with deja vu enabled.
+3. (NEW FUNCTION) Save the rhythm
+  - 3a. long-press "T rate switch".
+  - 3b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
+  - 3c. then press "T deja vu switch".
+  - 3d. then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents saving is executed and "alternative setting edit" mode exited.)
+4. Explore another random rhythm by changing "deja vu knob" or switching deja vu enabled-disabled.
+5. Lock the rhythm by setting "deja vu knob" to 50% with deja vu enabled.
+6. (NEW FUNCTION) Load the previous rhythm
+  - 6a. long-press "T rate switch".
+  - 6b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
+  - 6c. then press "X deja vu switch".
+  - 6d. then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents loading is executed and "alternative setting edit" mode exited.)
+
 ## Activate Markov algorithm of T mode
 
 We can select "Markov algorithm" of T mode.
@@ -254,38 +264,28 @@ Play scenario is:
   - 2a. press or long-press "T mode switch".
   - T mode becomes normal "drum algorithm" or "three state algorithm".
 
-## T rate cv input alternative mode
+## Set loop start position
 
-We can use T rate cv input as selecting deja vu loop length or start position.
+(Deprecated. It will be removed at next firmware release.)
 
-The cv range is from 0V to 5V. The cv value is reflected to deja vu loop value linearly (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16).
+We can select short length loop patterns from locked random rhythm.
 
-During deja vu loop cv input mode, T rate setting is set by T rate knob.
-
-The deja vu loop cv input mode setting is saved to non volatile memory.
+The loop start position setting is saved to non volatile memory.
 
 Play scenario is:
 
-1. (NEW FUNCTION) Set T rate cv input alternative mode
+1. Explore random rhythm.
+2. Lock the rhythm by setting "deja vu knob" to 50%(12 o'clock) with deja vu enabled.
+3. Set deja vu loop length using "loop length knob".
 
-  - (In "alternative setting edit" mode, "T mode switch" works as setting T rate cv input alternative mode.)
+4. (NEW FUNCTION) Set deja vu loop start position
 
-  - 1a. long-press "T rate switch".
-  - 1b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
-  - 1c. push "T mode switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
-  - T rate cv input works as deja vu loop length cv mode (Type A). In this mode, deja vu knob act as deja vu loop start position (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16) knob. This loop start position value is active only in this mode.
+  - (In "alternative setting edit" mode, "loop length knob" works as setting loop start position.)
 
->  - Repeat above 1a, 1b and 1c.
->  - T rate cv input works as deja vu loop start position cv mode (Type B). In this mode, deja vu knob act as no functional.
->
->  - Each repeating above 1a, 1b and 1c, T rate cv mode changes to Type A or Type B.
-
-2. Set T rate cv input normal mode
-
-  - 2a. long-press "T rate switch".
-  - 2b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
-  - 2c. long-press "T mode switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
-  - T rate cv input works as normal T rate cv input mode.
+  - 4a. long-press "T rate switch".
+  - 4b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
+  - 4c. turn "loop length knob" to set loop start position.
+  - 4d. push "T rate switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
 
 ## Notes
 
