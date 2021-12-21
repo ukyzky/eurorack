@@ -1,3 +1,11 @@
+# Rings woody firmware v01
+
+This firmware changes Rings dsp sample rate from 48kHz to 32kHz.
+
+The sound will be more woody, natural and organic like Elements.
+
+=======
+
 Mutable Instruments' Eurorack Modules.
 
 * [Blinds](http://mutable-instruments.net/modules/blinds): Quad VC-polarizer.
