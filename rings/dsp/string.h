@@ -98,7 +98,7 @@ class String {
   String() { }
   ~String() { }
   
-  void Init(bool enable_dispersion);
+  void Init(bool enable_dispersion, float sampleRate);
   void Process(const float* in, float* out, float* aux, size_t size);
   
   inline void set_frequency(float frequency) {
@@ -160,6 +160,8 @@ class String {
   DampingFilter fir_damping_filter_;
   stmlib::Svf iir_damping_filter_;
   stmlib::DCBlocker dc_blocker_;
+
+  float sample_rate_;
   
   DISALLOW_COPY_AND_ASSIGN(String);
 };

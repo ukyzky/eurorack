@@ -47,6 +47,7 @@ void Settings::Init() {
     data_.state.easter_egg = 0;
     data_.state.color_blind = 0;
     data_.calibration_data.normalization_detection_threshold = 0.75f;
+    data_.state.sample_rate_mode = 0;
     freshly_baked_ = true;
     Save();
   }
@@ -56,6 +57,7 @@ void Settings::Init() {
   }
   CONSTRAIN(data_.state.polyphony, 1, 4);
   CONSTRAIN(data_.state.model, 0, 5);
+  CONSTRAIN(data_.state.sample_rate_mode, 0, 1);
 }
 
 void Settings::Save() {

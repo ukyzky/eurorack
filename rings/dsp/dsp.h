@@ -36,8 +36,8 @@
 
 namespace rings {
   
-static const float kSampleRate = 32000.0f; //48000.0f;
-const float a3 = 440.0f / kSampleRate;
+//static const float kSampleRate = 48000.0f; //32000.0f;
+//const float a3 = 440.0f / kSampleRate;
 const size_t kMaxBlockSize = 24;
 
 }  // namespace rings

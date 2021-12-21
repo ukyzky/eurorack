@@ -46,7 +46,7 @@ class Resonator {
   Resonator() { }
   ~Resonator() { }
   
-  void Init();
+  void Init(float sampleRate);
   void Process(
       const float* in,
       float* out,

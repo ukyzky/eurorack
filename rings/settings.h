@@ -48,12 +48,16 @@ struct State {
   uint8_t model;
   uint8_t easter_egg;
   uint8_t color_blind;
+  uint8_t sample_rate_mode; // 0: normal 48kHz, 1: 32kHz like Elements
+  uint8_t dummyA;
+  uint8_t dummyB;
+  uint8_t dummyC;
 };
 
 struct SettingsData {
   CalibrationData calibration_data; // 40 bytes
-  State state;  // 4 bytes
-  uint8_t padding[20];
+  State state;  // 8 bytes
+  uint8_t padding[16];
 };
 
 class Settings {
@@ -70,6 +74,10 @@ class Settings {
   
   inline void ToggleEasterEgg() {
     data_.state.easter_egg = !data_.state.easter_egg;
+  }
+
+  inline void ToggleSampleRateMode() {
+    data_.state.sample_rate_mode = !data_.state.sample_rate_mode;
   }
   
   inline State* mutable_state() {

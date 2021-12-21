@@ -258,6 +258,9 @@ void Ui::OnSwitchReleased(const Event& e) {
         if (cv_scaler_->easter_egg()) {
           settings_->ToggleEasterEgg();
           AnimateEasterEggLeds();
+        } else if (cv_scaler_->easter_egg2()) {
+          settings_->ToggleSampleRateMode();
+          AnimateEasterEggLeds();
         } else {
           part_->set_polyphony(3);
           string_synth_->set_polyphony(3);
@@ -300,6 +303,9 @@ void Ui::OnSwitchReleased(const Event& e) {
       if (e.data >= kLongPressDuration) {
         if (cv_scaler_->easter_egg()) {
           settings_->ToggleEasterEgg();
+          AnimateEasterEggLeds();
+        } else if (cv_scaler_->easter_egg2()) {
+          settings_->ToggleSampleRateMode();
           AnimateEasterEggLeds();
         } else {
           int32_t model = part_->model();

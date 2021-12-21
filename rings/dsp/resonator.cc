@@ -39,12 +39,12 @@ namespace rings {
 using namespace std;
 using namespace stmlib;
 
-void Resonator::Init() {
+void Resonator::Init(float sampleRate) {
   for (int32_t i = 0; i < kMaxModes; ++i) {
     f_[i].Init();
   }
 
-  set_frequency(220.0f / kSampleRate);
+  set_frequency(220.0f / sampleRate);
   set_structure(0.25f);
   set_brightness(0.5f);
   set_damping(0.3f);

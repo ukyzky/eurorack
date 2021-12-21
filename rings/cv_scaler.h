@@ -116,7 +116,21 @@ class CvScaler {
         adc_lp_[ADC_CHANNEL_ATTENUVERTER_STRUCTURE] > 1.00f &&
         adc_lp_[ADC_CHANNEL_ATTENUVERTER_POSITION] < -1.00f;
   }
-  
+
+  inline bool easter_egg2() const { // for sample_rate_mode
+    return adc_lp_[ADC_CHANNEL_POT_FREQUENCY] < 0.1f &&
+        adc_lp_[ADC_CHANNEL_POT_STRUCTURE] > 0.9f &&
+        adc_lp_[ADC_CHANNEL_POT_BRIGHTNESS] < 0.1f &&
+        adc_lp_[ADC_CHANNEL_POT_POSITION] > 0.9f &&
+        adc_lp_[ADC_CHANNEL_POT_DAMPING] > 0.4f &&
+        adc_lp_[ADC_CHANNEL_POT_DAMPING] < 0.6f &&
+        adc_lp_[ADC_CHANNEL_ATTENUVERTER_BRIGHTNESS] < -1.00f &&
+        adc_lp_[ADC_CHANNEL_ATTENUVERTER_FREQUENCY] < -1.00f &&
+        adc_lp_[ADC_CHANNEL_ATTENUVERTER_DAMPING] < -1.00f &&
+        adc_lp_[ADC_CHANNEL_ATTENUVERTER_STRUCTURE] < -1.00f &&
+        adc_lp_[ADC_CHANNEL_ATTENUVERTER_POSITION] < -1.00f;
+  }
+
   inline void CalibrateC1() {
     cv_c1_ = adc_.float_value(ADC_CHANNEL_CV_V_OCT);
   }

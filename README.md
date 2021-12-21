@@ -1,8 +1,63 @@
-# Rings woody firmware v01
+# Rings woody firmware v02
 
-This firmware changes Rings dsp sample rate from 48kHz to 32kHz.
+This firmware can select Rings dsp sample rate 48kHz (normal) or 32kHz (like Elements).
 
-The sound will be more woody, natural and organic like Elements.
+The 32kHz sound will be more woody, natural and organic like Elements.
+
+## Operation of toggle sample rate
+
+We can toggle sample rate setting 48kHz and 32kHz.
+
+The sample rate setting is saved to non volatile memory.
+
+The instruction is nearly like Rings easter egg, but difference is
+- all attenuator knobs fully ccw.
+- after LED blinks, reboot power cycle needed.
+
+### Instruction
+
+1. **set the knobs:**
+
+Frequency: fully ccw
+
+Structure: fully cw
+
+Brightness: fully ccw
+
+Damping: centre
+
+Position: fully cw
+
+**set the attenuator knobs:**
+
+Brightness: fully ccw
+
+Frequency: fully ccw
+
+Damping: fully ccw
+
+Structure: fully ccw
+
+Position: fully ccw
+
+2. long-press polyphony button (long-press mode button is also ok)
+
+Then LED blinks a few seconds.
+The sample rate setting is saved to non volatile memory.
+
+3. reboot (power off and power on) Rings module
+
+then sample rate changes (toggle 48kHz or 32kHz).
+
+## Change log
+
+### v02
+
+- Add user interface of selecting Rings dsp sample rate 48kHz or 32kHz.
+
+### v01
+
+- Change Rings dsp sample rate from 48kHz to 32kHz.
 
 =======
 

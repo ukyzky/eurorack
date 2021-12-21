@@ -49,7 +49,7 @@ class FMVoice {
   FMVoice() { }
   ~FMVoice() { }
   
-  void Init();
+  void Init(float sampleRate);
   void Process(
       const float* in,
       float* out,
@@ -117,6 +117,8 @@ class FMVoice {
   float previous_sample_;
   
   Follower follower_;
+
+  float sample_rate_;
   
   DISALLOW_COPY_AND_ASSIGN(FMVoice);
 };

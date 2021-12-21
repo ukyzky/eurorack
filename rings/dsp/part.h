@@ -68,7 +68,7 @@ class Part {
   Part() { }
   ~Part() { }
   
-  void Init(uint16_t* reverb_buffer);
+  void Init(uint16_t* reverb_buffer, float sampleRate);
   
   void Process(
       const PerformanceState& performance_state,
@@ -182,6 +182,9 @@ class Part {
   Reverb reverb_;
   Limiter limiter_;
   
+  float sample_rate_;
+  float a3_;
+
   static float model_gains_[RESONATOR_MODEL_LAST];
   
   DISALLOW_COPY_AND_ASSIGN(Part);

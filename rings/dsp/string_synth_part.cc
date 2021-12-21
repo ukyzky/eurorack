@@ -35,7 +35,9 @@ namespace rings {
 using namespace std;
 using namespace stmlib;
 
-void StringSynthPart::Init(uint16_t* reverb_buffer) {
+void StringSynthPart::Init(uint16_t* reverb_buffer, float sampleRate) {
+  sample_rate_ = sampleRate;
+  a3_ = 440.0f / sample_rate_;
   active_group_ = 0;
   acquisition_delay_ = 0;
   
@@ -57,12 +59,12 @@ void StringSynthPart::Init(uint16_t* reverb_buffer) {
   
   limiter_.Init();
   
-  reverb_.Init(reverb_buffer);
+  reverb_.Init(reverb_buffer, sample_rate_);
   chorus_.Init(reverb_buffer);
   ensemble_.Init(reverb_buffer);
   
   note_filter_.Init(
-      kSampleRate / kMaxBlockSize,
+      sample_rate_ / kMaxBlockSize,
       0.001f,  // Lag time with a sharp edge on the V/Oct input or trigger.
       0.005f,  // Lag time after the trigger has been received.
       0.050f,  // Time to transition from reactive to filtered.
@@ -239,7 +241,7 @@ void StringSynthPart::ProcessEnvelopes(
   }
   
   // Convert the arbitrary values to actual units.
-  float period = kSampleRate / kMaxBlockSize;
+  float period = sample_rate_ / kMaxBlockSize;
   float attack_time = SemitonesToRatio(attack * 96.0f) * 0.005f * period;
   // float decay_time = SemitonesToRatio(decay * 96.0f) * 0.125f * period;
   float decay_time = SemitonesToRatio(decay * 84.0f) * 0.180f * period;
@@ -286,7 +288,7 @@ void StringSynthPart::ProcessFormantFilter(
     float b = formants[vowel_integral + 1][i];
     float f = a + (b - a) * vowel_fractional;
     f *= shift;
-    formant_filter_[i].set_f_q<FREQUENCY_DIRTY>(f / kSampleRate, resonance);
+    formant_filter_[i].set_f_q<FREQUENCY_DIRTY>(f / sample_rate_, resonance);
     formant_filter_[i].Process<FILTER_MODE_BAND_PASS>(
         filter_in_buffer_,
         filter_out_buffer_,
@@ -376,7 +378,7 @@ void StringSynthPart::Process(
         amplitudes[2 * (num_harmonics - 1) + 1] += amplitudes[2 * i + 1];
       }
 
-      float frequency = SemitonesToRatio(note - 69.0f) * a3;
+      float frequency = SemitonesToRatio(note - 69.0f) * a3_;
       voice_[group * chord_size + chord_note].Render(
           frequency,
           amplitudes,

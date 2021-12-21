@@ -37,7 +37,9 @@ namespace rings {
 using namespace std;
 using namespace stmlib;
 
-void Part::Init(uint16_t* reverb_buffer) {
+void Part::Init(uint16_t* reverb_buffer, float sampleRate) {
+  sample_rate_ = sampleRate;
+  a3_ = 440.0f / sample_rate_;
   active_voice_ = 0;
   
   fill(&note_[0], &note_[kMaxPolyphony], 0.0f);
@@ -50,14 +52,14 @@ void Part::Init(uint16_t* reverb_buffer) {
   for (int32_t i = 0; i < kMaxPolyphony; ++i) {
     excitation_filter_[i].Init();
     plucker_[i].Init();
-    dc_blocker_[i].Init(1.0f - 10.0f / kSampleRate);
+    dc_blocker_[i].Init(1.0f - 10.0f / sample_rate_);
   }
   
-  reverb_.Init(reverb_buffer);
+  reverb_.Init(reverb_buffer, sample_rate_);
   limiter_.Init();
 
   note_filter_.Init(
-      kSampleRate / kMaxBlockSize,
+      sample_rate_ / kMaxBlockSize,
       0.001f,  // Lag time with a sharp edge on the V/Oct input or trigger.
       0.010f,  // Lag time after the trigger has been received.
       0.050f,  // Time to transition from reactive to filtered.
@@ -74,7 +76,7 @@ void Part::ConfigureResonators() {
       {
         int32_t resolution = 64 / polyphony_ - 4;
         for (int32_t i = 0; i < polyphony_; ++i) {
-          resonator_[i].Init();
+          resonator_[i].Init(sample_rate_);
           resonator_[i].set_resolution(resolution);
         }
       }
@@ -91,9 +93,9 @@ void Part::ConfigureResonators() {
         for (int32_t i = 0; i < kNumStrings; ++i) {
           bool has_dispersion = model_ == RESONATOR_MODEL_STRING || \
               model_ == RESONATOR_MODEL_STRING_AND_REVERB;
-          string_[i].Init(has_dispersion);
+          string_[i].Init(has_dispersion, sample_rate_);
 
-          float f_lfo = float(kMaxBlockSize) / float(kSampleRate);
+          float f_lfo = float(kMaxBlockSize) / float(sample_rate_);
           f_lfo *= lfo_frequencies[i];
           lfo_[i].Init<COSINE_OSCILLATOR_APPROXIMATE>(f_lfo);
         }
@@ -106,7 +108,7 @@ void Part::ConfigureResonators() {
     case RESONATOR_MODEL_FM_VOICE:
       {
         for (int32_t i = 0; i < polyphony_; ++i) {
-          fm_voice_[i].Init();
+          fm_voice_[i].Init(sample_rate_);
         }
       }
       break;
@@ -371,7 +373,7 @@ void Part::RenderStringVoice(
         frequencies,
         num_strings);
     for (int32_t i = 0; i < num_strings; ++i) {
-      frequencies[i] = SemitonesToRatio(frequencies[i] - 69.0f) * a3;
+      frequencies[i] = SemitonesToRatio(frequencies[i] - 69.0f) * a3_;
     }
   } else {
     frequencies[0] = frequency;
@@ -500,13 +502,13 @@ void Part::Process(
     // filter.
     float cutoff = patch.brightness * (2.0f - patch.brightness);
     float note = note_[voice] + performance_state.tonic + performance_state.fm;
-    float frequency = SemitonesToRatio(note - 69.0f) * a3;
+    float frequency = SemitonesToRatio(note - 69.0f) * a3_;
     float filter_cutoff_range = performance_state.internal_exciter
       ? frequency * SemitonesToRatio((cutoff - 0.5f) * 96.0f)
       : 0.4f * SemitonesToRatio((cutoff - 1.0f) * 108.0f);
     float filter_cutoff = min(voice == active_voice_
       ? filter_cutoff_range
-      : (10.0f / kSampleRate), 0.499f);
+      : (10.0f / sample_rate_), 0.499f);
     float filter_q = performance_state.internal_exciter ? 1.5f : 0.8f;
 
     // Process input with excitation filter. Inactive voices receive silence.

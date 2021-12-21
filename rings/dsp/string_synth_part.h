@@ -74,7 +74,7 @@ class StringSynthPart {
   StringSynthPart() { }
   ~StringSynthPart() { }
   
-  void Init(uint16_t* reverb_buffer);
+  void Init(uint16_t* reverb_buffer, float sampleRate);
   
   void Process(
       const PerformanceState& performance_state,
@@ -133,6 +133,9 @@ class StringSynthPart {
   
   bool clear_fx_;
   
+  float sample_rate_;
+  float a3_;
+
   DISALLOW_COPY_AND_ASSIGN(StringSynthPart);
 };
 

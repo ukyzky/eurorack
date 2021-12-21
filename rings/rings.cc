@@ -85,6 +85,9 @@ float aux[kMaxBlockSize];
 const float kNoiseGateThreshold = 0.00003f;
 float in_level = 0.0f;
 
+float sample_rate = 48000.0f;
+float a3 = 440.0f / sample_rate;
+
 void FillBuffer(Codec::Frame* input, Codec::Frame* output, size_t size) {
 #ifdef PROFILE_INTERRUPT
   TIC
@@ -126,6 +129,11 @@ void FillBuffer(Codec::Frame* input, Codec::Frame* output, size_t size) {
 #endif  // PROFILE_INTERRUPT
 }
 
+void UpdateSampleRate(float sampleRate) {
+  sample_rate = sampleRate;
+  a3 = 440.0f / sampleRate;
+}
+
 void Init() {
   System sys;
   Version version;
@@ -133,15 +141,19 @@ void Init() {
   sys.Init(true);
   version.Init();
 
-  strummer.Init(0.01f, kSampleRate / kMaxBlockSize);
-  part.Init(reverb_buffer);
-  string_synth.Init(reverb_buffer);
-
   settings.Init();
+  if (settings.state().sample_rate_mode != 0) {
+    UpdateSampleRate(32000.0f);
+  }
+
+  strummer.Init(0.01f, sample_rate / kMaxBlockSize, sample_rate);
+  part.Init(reverb_buffer, sample_rate);
+  string_synth.Init(reverb_buffer, sample_rate);
+
   cv_scaler.Init(settings.mutable_calibration_data());
   ui.Init(&settings, &cv_scaler, &part, &string_synth);
   
-  if (!codec.Init(!version.revised(), kSampleRate)) {
+  if (!codec.Init(!version.revised(), sample_rate)) {
     ui.Panic();
   }
   if (!codec.Start(kMaxBlockSize, &FillBuffer)) {
