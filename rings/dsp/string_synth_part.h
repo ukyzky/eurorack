@@ -101,7 +101,9 @@ class StringSynthPart {
     }
     fx_type_ = fx_type;
   }
-  
+
+  inline void set_bryan_chords(bool chords) { bryan_chords_ = chords; }
+
  private:
   void ProcessEnvelopes(float shape, uint8_t* flags, float* values);
   void ComputeRegistration(float gain, float registration, float* amplitudes);
@@ -135,6 +137,7 @@ class StringSynthPart {
   
   float sample_rate_;
   float a3_;
+  bool bryan_chords_;
 
   DISALLOW_COPY_AND_ASSIGN(StringSynthPart);
 };

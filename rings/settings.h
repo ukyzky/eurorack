@@ -49,7 +49,7 @@ struct State {
   uint8_t easter_egg;
   uint8_t color_blind;
   uint8_t sample_rate_mode; // 0: normal 48kHz, 1: 32kHz like Elements
-  uint8_t dummyA;
+  uint8_t bryan_chords; // 0: false, 1: true
   uint8_t dummyB;
   uint8_t dummyC;
 };
@@ -79,7 +79,11 @@ class Settings {
   inline void ToggleSampleRateMode() {
     data_.state.sample_rate_mode = !data_.state.sample_rate_mode;
   }
-  
+
+  inline void ToggleBryanChords() {
+    data_.state.bryan_chords = !data_.state.bryan_chords;
+  }
+
   inline State* mutable_state() {
     return &data_.state;
   }

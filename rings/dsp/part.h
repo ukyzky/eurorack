@@ -99,6 +99,8 @@ class Part {
     }
   }
 
+  inline void set_bryan_chords(bool chords) { bryan_chords_ = chords; }
+
  private:
   void ConfigureResonators();
   void RenderModalVoice(
@@ -184,6 +186,7 @@ class Part {
   
   float sample_rate_;
   float a3_;
+  bool bryan_chords_;
 
   static float model_gains_[RESONATOR_MODEL_LAST];
   

@@ -51,6 +51,8 @@ enum UiMode {
   UI_MODE_CALIBRATION_HIGH,
   UI_MODE_EASTER_EGG_INTRO,
   UI_MODE_EASTER_EGG_OUTRO,
+  UI_MODE_EASTER_EGG2_INTRO,
+  UI_MODE_EASTER_EGG2_OUTRO,
   UI_MODE_PANIC,
 };
 
@@ -89,7 +91,15 @@ class Ui {
   }
   
   uint8_t HandleFactoryTestingRequest(uint8_t command);
+
+  inline void set_reboot_func(void (*func)()) {
+    reboot_func_ = func;
+  }
   
+  inline void Reboot() {
+    reboot_func_();
+  }
+
  private:
   void OnSwitchPressed(const stmlib::Event& e);
   void OnSwitchReleased(const stmlib::Event& e);
@@ -101,6 +111,7 @@ class Ui {
   void CalibrateHigh();
   void SaveState();
   void AnimateEasterEggLeds();
+  void AnimateEasterEgg2Leds();
 
   stmlib::EventQueue<16> queue_;
   
@@ -116,6 +127,8 @@ class Ui {
   Part* part_;
   StringSynthPart* string_synth_;
   
+  void (*reboot_func_)();
+
   DISALLOW_COPY_AND_ASSIGN(Ui);
 };
 

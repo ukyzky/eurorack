@@ -22,6 +22,8 @@
 // 
 // See http://creativecommons.org/licenses/MIT/ for more information.
 
+#include "stmlib/system/bootloader_utils.h"
+
 #include "rings/drivers/adc.h"
 #include "rings/drivers/codec.h"
 #include "rings/drivers/debug_pin.h"
@@ -39,6 +41,8 @@
 
 using namespace rings;
 using namespace stmlib;
+
+const uint32_t kStartAddress = 0x08008000;
 
 uint16_t reverb_buffer[32768] __attribute__ ((section (".ccmdata")));
 
@@ -134,6 +138,13 @@ void UpdateSampleRate(float sampleRate) {
   a3 = 440.0f / sampleRate;
 }
 
+void Reboot() {
+  codec.Stop();
+  cv_scaler.DeInit();
+  Uninitialize();
+  JumpTo(kStartAddress);
+}
+
 void Init() {
   System sys;
   Version version;
@@ -168,6 +179,9 @@ void Init() {
     debug_port.Init();
 #endif  // PROFILE_INTERRUPT
   }
+
+  ui.set_reboot_func(&Reboot);
+
   sys.StartTimers();
 }
 

@@ -68,11 +68,16 @@ void Ui::Init(
   
   part_->set_polyphony(settings_->state().polyphony);
   part_->set_model(static_cast<ResonatorModel>(settings_->state().model));
+  part_->set_bryan_chords(settings_->state().bryan_chords);
   string_synth_->set_polyphony(settings_->state().polyphony);
   string_synth_->set_fx(static_cast<FxType>(settings_->state().model));
+  string_synth_->set_bryan_chords(settings_->state().bryan_chords);
   mode_ = settings_->state().easter_egg
       ? UI_MODE_EASTER_EGG_INTRO
       : UI_MODE_NORMAL;
+  if (!settings_->state().easter_egg) {
+    mode_ = UI_MODE_EASTER_EGG2_INTRO;
+  }
 }
 
 void Ui::SaveState() {
@@ -85,6 +90,12 @@ void Ui::AnimateEasterEggLeds() {
   mode_ = settings_->state().easter_egg
       ? UI_MODE_EASTER_EGG_INTRO
       : UI_MODE_EASTER_EGG_OUTRO;
+}
+
+void Ui::AnimateEasterEgg2Leds() {
+  mode_ = settings_->state().sample_rate_mode || settings_->state().bryan_chords
+      ? UI_MODE_EASTER_EGG2_INTRO
+      : UI_MODE_EASTER_EGG2_OUTRO;
 }
 
 void Ui::Poll() {
@@ -224,6 +235,46 @@ void Ui::Poll() {
       }
       break;
     
+    case UI_MODE_EASTER_EGG2_INTRO:
+      {
+        uint8_t pwm_counter = system_clock.milliseconds() & 15;
+        uint8_t triangle_1 = (system_clock.milliseconds() / 7) & 31;
+        uint8_t triangle_2 = (system_clock.milliseconds() / 17) & 31;
+        triangle_1 = triangle_1 < 16 ? triangle_1 : 31 - triangle_1;
+        triangle_2 = triangle_2 < 16 ? triangle_2 : 31 - triangle_2;
+        bool sampleRateMode = settings_->state().sample_rate_mode;
+        bool bryan = settings_->state().bryan_chords;
+        leds_.set(
+            0,
+            sampleRateMode ? 0 : triangle_1 > pwm_counter,
+            sampleRateMode ? triangle_2 > pwm_counter : 0);
+        leds_.set(
+            1,
+            bryan ? 0 : triangle_2 > pwm_counter,
+            bryan ? triangle_1 > pwm_counter : 0);
+      }
+      break;
+
+    case UI_MODE_EASTER_EGG2_OUTRO:
+      {
+        uint8_t pwm_counter = 7;
+        uint8_t triangle_1 = (system_clock.milliseconds() / 9) & 31;
+        uint8_t triangle_2 = (system_clock.milliseconds() / 13) & 31;
+        triangle_1 = triangle_1 < 16 ? triangle_1 : 31 - triangle_1;
+        triangle_2 = triangle_2 < 16 ? triangle_2 : 31 - triangle_2;
+        bool sampleRateMode = settings_->state().sample_rate_mode;
+        bool bryan = settings_->state().bryan_chords;
+        leds_.set(
+          0,
+          sampleRateMode ? 0 : triangle_1 < pwm_counter,
+          sampleRateMode ? triangle_1 > pwm_counter : 0);
+        leds_.set(
+          1,
+          bryan ? 0 : triangle_2 > pwm_counter,
+          bryan ? triangle_2 < pwm_counter : 0);
+      }
+      break;
+
     case UI_MODE_PANIC:
       leds_.set(0, blink, false);
       leds_.set(1, blink, false);
@@ -260,7 +311,10 @@ void Ui::OnSwitchReleased(const Event& e) {
           AnimateEasterEggLeds();
         } else if (cv_scaler_->easter_egg2()) {
           settings_->ToggleSampleRateMode();
-          AnimateEasterEggLeds();
+          //AnimateEasterEgg2Leds();
+          SaveState();
+          Reboot();
+          return;
         } else {
           part_->set_polyphony(3);
           string_synth_->set_polyphony(3);
@@ -305,8 +359,10 @@ void Ui::OnSwitchReleased(const Event& e) {
           settings_->ToggleEasterEgg();
           AnimateEasterEggLeds();
         } else if (cv_scaler_->easter_egg2()) {
-          settings_->ToggleSampleRateMode();
-          AnimateEasterEggLeds();
+          settings_->ToggleBryanChords();
+          part_->set_bryan_chords(settings_->state().bryan_chords);
+          string_synth_->set_bryan_chords(settings_->state().bryan_chords);
+          AnimateEasterEgg2Leds();
         } else {
           int32_t model = part_->model();
           if (model >= 3) {
@@ -390,6 +446,11 @@ void Ui::DoEvents() {
     mode_ = UI_MODE_NORMAL;
   }
   if (mode_ == UI_MODE_EASTER_EGG_INTRO || mode_ == UI_MODE_EASTER_EGG_OUTRO) {
+    if (queue_.idle_time() > 3000) {
+      mode_ = UI_MODE_EASTER_EGG2_INTRO;
+      queue_.Touch();
+    }
+  } else if (mode_ == UI_MODE_EASTER_EGG2_INTRO || mode_ == UI_MODE_EASTER_EGG2_OUTRO) {
     if (queue_.idle_time() > 3000) {
       mode_ = UI_MODE_NORMAL;
       queue_.Touch();

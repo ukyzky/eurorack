@@ -104,13 +104,13 @@ void StringSynthPart::ComputeRegistration(
   }
 }
 
-#ifdef BRYAN_CHORDS
+//#ifdef BRYAN_CHORDS
 
 // Chord table by Bryan Noll:
 // - more compact, leaving room for a bass
 // - more frequent note changes between adjacent chords.
 // - dropped fifth.
-const float chords[kMaxStringSynthPolyphony][kNumChords][kMaxChordSize] = {
+const float bryan_chords[kMaxStringSynthPolyphony][kNumChords][kMaxChordSize] = {
   {
     { -12.0f, -0.01f,  0.0f,  0.01f,  0.02f, 11.99f, 12.0f, 24.0f }, // OCT
     { -12.0f, -5.01f, -5.0f,  0.0f,   7.0f,  12.0f,  19.0f, 24.0f }, // 5
@@ -165,7 +165,7 @@ const float chords[kMaxStringSynthPolyphony][kNumChords][kMaxChordSize] = {
   }
 };
 
-#else
+//#else
 
 // Original chord table:
 // - wider, occupies more room in the spectrum.
@@ -226,7 +226,7 @@ const float chords[kMaxStringSynthPolyphony][kNumChords][kMaxChordSize] = {
   }
 };
 
-#endif  // BRYAN_CHORDS
+//#endif  // BRYAN_CHORDS
 
 void StringSynthPart::ProcessEnvelopes(
     float shape,
@@ -352,7 +352,7 @@ void StringSynthPart::Process(
     
     // Note enough polyphony for smooth transition between chords.
     for (int32_t i = 0; i < chord_size; ++i) {
-      float n = chords[polyphony_ - 1][group_[group].chord][i];
+      float n = bryan_chords_ ? bryan_chords[polyphony_ - 1][group_[group].chord][i] : chords[polyphony_ - 1][group_[group].chord][i];
       notes[i].note = n;
       notes[i].amplitude = n >= 0.0f && n <= 17.0f ? 1.0f : 0.7f;
     }

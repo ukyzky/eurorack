@@ -202,6 +202,10 @@ class CvScaler {
         break;
     }
   }
+
+  inline void DeInit() {
+    adc_.DeInit();
+  }
   
  private:
   void DetectNormalization();

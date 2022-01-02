@@ -1,18 +1,31 @@
-# Rings woody firmware v02
+# Rings woody firmware v03
 
-This firmware can select Rings dsp sample rate 48kHz (normal) or 32kHz (like Elements).
+This firmware can select Rings dsp sample rate 32kHz (like Elements) or 48kHz (normal).
 
 The 32kHz sound will be more woody, natural and organic like Elements.
 
+And this firmware can select chord constituting in easter egg mode (like Plaits or normal).
+
+(firmware v01 and v02 chord constituting is like Plaits.)
+
+This firmware's default setting value is sample rate 32kHz and chord like Plaits.
+
+## indicating setting value
+
+When power up Rings with this firmware,
+
+If easter egg mode enabled, LEDs blinks a few seconds. (It's the same behavior of normal firmware.)
+
+Then polyphony LED blinks a few seconds (green color: sample rate 32kHz, red color: 48kHz) and mode LED blinks a few seconds (green color: chord like Plaits, red color: normal).
+
 ## Operation of toggle sample rate
 
-We can toggle sample rate setting 48kHz and 32kHz.
+We can toggle sample rate setting 32kHz or 48kHz.
 
 The sample rate setting is saved to non volatile memory.
 
 The instruction is nearly like Rings easter egg, but difference is
 - all attenuator knobs fully ccw.
-- after LED blinks, reboot power cycle needed.
 
 ### Instruction
 
@@ -40,16 +53,68 @@ Structure: fully ccw
 
 Position: fully ccw
 
-2. long-press polyphony button (long-press mode button is also ok)
+2. long-press **polyphony** button
 
-Then LED blinks a few seconds.
+Then sample rate changes (toggle 48kHz or 32kHz).
 The sample rate setting is saved to non volatile memory.
 
-3. reboot (power off and power on) Rings module
+Then automatically reboot module.
 
-then sample rate changes (toggle 48kHz or 32kHz).
+(Then if easter egg mode enabled, LEDs blinks a few seconds.)
+
+Then polyphony LED blinks a few seconds (green color: 32kHz, red color: 48kHz).
+(And mode LED blinks a few seconds (green color: chord like Plaits, red color: normal).)
+
+## Operation of toggle chord constituting
+
+We can toggle chord constituting normal or like Plaits (by enable/disable BRYAN_CHORDS).
+
+The chord setting is saved to non volatile memory.
+
+The instruction is nearly like Rings easter egg, but difference is
+- all attenuator knobs fully ccw.
+
+### Instruction
+
+1. **set the knobs:**
+
+Frequency: fully ccw
+
+Structure: fully cw
+
+Brightness: fully ccw
+
+Damping: centre
+
+Position: fully cw
+
+**set the attenuator knobs:**
+
+Brightness: fully ccw
+
+Frequency: fully ccw
+
+Damping: fully ccw
+
+Structure: fully ccw
+
+Position: fully ccw
+
+2. long-press **mode** button
+
+Chord constituting changes immediately (normal or like Plaits).
+
+Then mode LED blinks a few seconds (green color: chord like Plaits, red color: normal).
+(And polyphony LED blinks a few seconds (green color: 32kHz, red color: 48kHz).)
+
+The chord setting is saved to non volatile memory.
 
 ## Change log
+
+### v03
+
+- Add user interface of selecting Rings easter egg mode chord constituting normal or like Plaits.
+- Automatically reboot after selecting dsp sample rate.
 
 ### v02
 
