@@ -69,6 +69,11 @@ void Ui::Init(
 
   save_slot_index_ = -1;
   load_slot_index_ = -1;
+
+  alternative_led_blink_ = 0;
+  alternative_led_count_ = 0;
+  alternative_bootup_count_ = 0;
+  mode_ = UI_MODE_ALTERNATIVE_BOOTUP;
   
   leds_.Init();
   switches_.Init();
@@ -147,7 +152,7 @@ void Ui::Poll() {
     }
   }
 
-  if (mode_ == UI_MODE_SAVELOAD_CONFIRMED) {
+  if (mode_ == UI_MODE_ALTERNATIVE_CONFIRMED) {
     saveload_confirmed_tick_count_ += 1;
     if (saveload_confirmed_tick_count_ > kSaveLoadConfirmedLedTickCount) {
       saveload_confirmed_tick_count_ = 0;
@@ -259,17 +264,14 @@ void Ui::UpdateLEDs() {
   switch (mode_) {
     case UI_MODE_NORMAL:
     case UI_MODE_RECORD_SCALE:
-    case UI_MODE_SAVELOAD:
-    case UI_MODE_SAVELOAD_CONFIRMED:
+    case UI_MODE_ALTERNATIVE_CONFIRMED:
       {
         if (state.t_model == 6) { // markov
           leds_.set(LED_T_MODEL, MakeColorForMarkov(state.t_model, cb));
         } else {
         leds_.set(LED_T_MODEL, MakeColor(state.t_model, cb));
         }
-        if (mode_ == UI_MODE_SAVELOAD) {
-          leds_.set(LED_T_RANGE, blink ? MakeColor(state.t_range, cb) : LED_COLOR_OFF);
-        } else if (mode_ == UI_MODE_SAVELOAD_CONFIRMED) {
+        if (mode_ == UI_MODE_ALTERNATIVE_CONFIRMED) {
           leds_.set(LED_T_RANGE, fast_blink ? MakeColor(state.t_range, cb) : LED_COLOR_OFF);
         } else {
           leds_.set(LED_T_RANGE, MakeColor(state.t_range, cb));
@@ -283,7 +285,7 @@ void Ui::UpdateLEDs() {
             LED_X_DEJA_VU,
             DejaVuColor(DejaVuState(state.x_deja_vu), deja_vu_lock_));
         
-        if (mode_ == UI_MODE_NORMAL || mode_ == UI_MODE_SAVELOAD || mode_ == UI_MODE_SAVELOAD_CONFIRMED) {
+        if (mode_ == UI_MODE_NORMAL || mode_ == UI_MODE_ALTERNATIVE_CONFIRMED) {
           leds_.set(LED_X_RANGE,
                     state.x_register_mode
                         ? LED_COLOR_OFF
@@ -323,8 +325,145 @@ void Ui::UpdateLEDs() {
       leds_.set(LED_X_CONTROL_MODE, !blink ? LED_COLOR_RED : LED_COLOR_OFF);
       leds_.set(LED_X_RANGE, blink ? LED_COLOR_RED : LED_COLOR_OFF);
       break;
+
+    case UI_MODE_ALTERNATIVE_BOOTUP:
+      if (alternative_bootup_count_ == 0) { // start bootup
+        alternative_bootup_count_ = 1;
+      }
+
+      if (alternative_led_blink_ != blink) {
+        if (alternative_bootup_count_ >= 3) { // end bootup
+          mode_ = UI_MODE_NORMAL;
+          break;
+        }
+
+        switch (alternative_led_count_ % 3) {
+          case 0:
+            leds_.set(LED_T_DEJA_VU, LED_COLOR_YELLOW);
+            leds_.set(LED_X_DEJA_VU, LED_COLOR_OFF);
+            leds_.set(LED_X_EXT, LED_COLOR_OFF);
+            break;
+          case 1:
+            leds_.set(LED_T_DEJA_VU, LED_COLOR_OFF);
+            leds_.set(LED_X_DEJA_VU, LED_COLOR_YELLOW);
+            leds_.set(LED_X_EXT, LED_COLOR_OFF);
+            break;
+          case 2:
+          default:
+            leds_.set(LED_T_DEJA_VU, LED_COLOR_OFF);
+            leds_.set(LED_X_DEJA_VU, LED_COLOR_OFF);
+            leds_.set(LED_X_EXT, LED_COLOR_YELLOW);
+            break;
+        }
+
+        alternative_led_blink_ = blink;
+        if (alternative_led_count_ >= 2) {
+          alternative_led_count_ = 0;
+          alternative_bootup_count_ += 1;
+        } else {
+          alternative_led_count_ += 1;
+        }
+      }
+      break;
+
+    case UI_MODE_ALTERNATIVE:
+      if (alternative_led_blink_ != blink) {
+        switch (alternative_led_count_ % 3) {
+          case 0:
+            leds_.set(LED_T_DEJA_VU, LED_COLOR_YELLOW);
+            leds_.set(LED_X_DEJA_VU, LED_COLOR_OFF);
+            leds_.set(LED_X_EXT, LED_COLOR_OFF);
+            break;
+          case 1:
+            leds_.set(LED_T_DEJA_VU, LED_COLOR_OFF);
+            leds_.set(LED_X_DEJA_VU, LED_COLOR_YELLOW);
+            leds_.set(LED_X_EXT, LED_COLOR_OFF);
+            break;
+          case 2:
+          default:
+            leds_.set(LED_T_DEJA_VU, LED_COLOR_OFF);
+            leds_.set(LED_X_DEJA_VU, LED_COLOR_OFF);
+            leds_.set(LED_X_EXT, LED_COLOR_YELLOW);
+            break;
+        }
+
+        alternative_led_blink_ = blink;
+        if (alternative_led_count_ >= 2) {
+          alternative_led_count_ = 0;
+        } else {
+          alternative_led_count_ += 1;
+        }
+      }
+
+      switch (alternative_settings_mode_) {
+        case ALTERNATIVE_SETTINGS_MODE_RESET_IN:
+          leds_.set(LED_T_MODEL, LED_COLOR_GREEN);
+          leds_.set(LED_X_CONTROL_MODE, LED_COLOR_GREEN);
+          UpdateLEDsAlternativeValues(state.x_clock_mode);
+          break;
+        case ALTERNATIVE_SETTINGS_MODE_LOOP:
+          leds_.set(LED_T_MODEL, LED_COLOR_GREEN);
+          leds_.set(LED_X_CONTROL_MODE, LED_COLOR_YELLOW);
+          UpdateLEDsAlternativeValues(state.loop_cv_mode);
+          break;
+        case ALTERNATIVE_SETTINGS_MODE_QUANTIZER_SCALE:
+          leds_.set(LED_T_MODEL, LED_COLOR_GREEN);
+          leds_.set(LED_X_CONTROL_MODE, LED_COLOR_RED);
+          UpdateLEDsAlternativeValues(state.quantizer_cv_mode);
+          break;
+        case ALTERNATIVE_SETTINGS_MODE_QUANTIZER_ROOT:
+        default:
+          leds_.set(LED_T_MODEL, LED_COLOR_YELLOW);
+          leds_.set(LED_X_CONTROL_MODE, LED_COLOR_RED);
+          UpdateLEDsAlternativeValues(state.root_cv_mode);
+          break;
+      }
+      break;
   }
   leds_.Write();
+}
+
+inline void Ui::UpdateLEDsAlternativeValues(int value) {
+  switch (value) {
+    case 0:
+      leds_.set(LED_T_RANGE, LED_COLOR_GREEN);
+      leds_.set(LED_X_RANGE, LED_COLOR_GREEN);
+      break;
+    case 1:
+      leds_.set(LED_T_RANGE, LED_COLOR_GREEN);
+      leds_.set(LED_X_RANGE, LED_COLOR_YELLOW);
+      break;
+    case 2:
+      leds_.set(LED_T_RANGE, LED_COLOR_GREEN);
+      leds_.set(LED_X_RANGE, LED_COLOR_RED);
+      break;
+    case 3:
+      leds_.set(LED_T_RANGE, LED_COLOR_YELLOW);
+      leds_.set(LED_X_RANGE, LED_COLOR_GREEN);
+      break;
+    case 4:
+      leds_.set(LED_T_RANGE, LED_COLOR_YELLOW);
+      leds_.set(LED_X_RANGE, LED_COLOR_YELLOW);
+      break;
+    case 5:
+      leds_.set(LED_T_RANGE, LED_COLOR_YELLOW);
+      leds_.set(LED_X_RANGE, LED_COLOR_RED);
+      break;
+    case 6:
+      leds_.set(LED_T_RANGE, LED_COLOR_RED);
+      leds_.set(LED_X_RANGE, LED_COLOR_GREEN);
+      break;
+    case 7:
+      leds_.set(LED_T_RANGE, LED_COLOR_RED);
+      leds_.set(LED_X_RANGE, LED_COLOR_YELLOW);
+      break;
+    case 8:
+      leds_.set(LED_T_RANGE, LED_COLOR_RED);
+      leds_.set(LED_X_RANGE, LED_COLOR_RED);
+      break;
+    default:
+      break;
+  }
 }
 
 void Ui::FlushEvents() {
@@ -353,14 +492,14 @@ void Ui::OnSwitchReleased(const Event& e) {
 
   State* state = settings_->mutable_state();
 
-  if (mode_ == UI_MODE_SAVELOAD) {
+  if (mode_ == UI_MODE_ALTERNATIVE) {
     if (e.control_id == SWITCH_T_DEJA_VU) {
       // save slot A
       save_slot_index_ = 0;
       load_slot_index_ = -1;
       saveload_confirmed_tick_count_ = 0;
       ignore_release_[SWITCH_T_DEJA_VU] = true;
-      mode_ = UI_MODE_SAVELOAD_CONFIRMED;
+      mode_ = UI_MODE_ALTERNATIVE_CONFIRMED;
       ExitAdditionalAlternateKnobMapping();
       return;
     }
@@ -370,16 +509,25 @@ void Ui::OnSwitchReleased(const Event& e) {
       save_slot_index_ = -1;
       saveload_confirmed_tick_count_ = 0;
       ignore_release_[SWITCH_X_DEJA_VU] = true;
-      mode_ = UI_MODE_SAVELOAD_CONFIRMED;
+      mode_ = UI_MODE_ALTERNATIVE_CONFIRMED;
       ExitAdditionalAlternateKnobMapping();
       return;
     }
     if (e.control_id == SWITCH_T_RANGE) {
-      // cancel save
+      // change alternative settings mode
+      alternative_settings_mode_ += 1;
+      if (alternative_settings_mode_ >= ALTERNATIVE_SETTINGS_MODE_COUNT) {
+        alternative_settings_mode_ = 0;
+      }
+      ignore_release_[SWITCH_T_RANGE] = true;
+      return;
+    }
+    if (e.control_id == SWITCH_X_EXT) {
+      // exit alternative settings mode
       save_slot_index_ = -1;
       load_slot_index_ = -1;
       saveload_confirmed_tick_count_ = 0;
-      ignore_release_[SWITCH_T_RANGE] = true;
+      ignore_release_[SWITCH_X_EXT] = true;
       if (e.data >= kLongPressDuration) {
         // all reset of alternate function settings
         state->loop_start = 0;
@@ -387,92 +535,60 @@ void Ui::OnSwitchReleased(const Event& e) {
         state->quantizer_cv_mode = 0; // normal t jitter cv
         state->root_cv_mode = 0; // normal x range cv
         state->loop_cv_mode = 0; // normal t rate cv
-        mode_ = UI_MODE_SAVELOAD_CONFIRMED;
-      } else {
-        mode_ = UI_MODE_NORMAL;
       }
-      ExitAdditionalAlternateKnobMapping();
-      if (e.data >= kLongPressDuration) {
-        SaveState();
-      }
-      return;
-    }
-    if (e.control_id == SWITCH_X_EXT) {
-      // change x clock mode
-      if (e.data >= kLongPressDuration) {
-        if (state->x_clock_mode) {
-          state->x_clock_mode = 0; // normal
-        }
-      } else {
-        if (state->x_clock_mode == 1) {
-          state->x_clock_mode = 2; // t hold
-        } else {
-          state->x_clock_mode = 1; // t reset
-        }
-      }
-      saveload_confirmed_tick_count_ = 0;
-      ignore_release_[SWITCH_X_EXT] = true;
-      mode_ = UI_MODE_SAVELOAD_CONFIRMED;
+      mode_ = UI_MODE_ALTERNATIVE_CONFIRMED;
       ExitAdditionalAlternateKnobMapping();
       SaveState();
       return;
     }
     if (e.control_id == SWITCH_X_RANGE) {
-      // change quantizer scale cv mode
-      if (e.data >= kLongPressDuration) {
-        if (state->quantizer_cv_mode) {
-          state->quantizer_cv_mode = 0; // normal t jitter cv
-        }
-      } else {
-        if (state->quantizer_cv_mode == 0) {
-          state->quantizer_cv_mode = 1; // x quantizer scale select cv
-        }
+      // change alternative settings value
+      switch (alternative_settings_mode_) {
+        case ALTERNATIVE_SETTINGS_MODE_RESET_IN:
+          if (state->x_clock_mode == 0) {
+            state->x_clock_mode = 1; // t reset
+          } else if (state->x_clock_mode == 1) {
+            state->x_clock_mode = 2; // t hold
+          } else {
+            state->x_clock_mode = 0;
+          }
+          break;
+        case ALTERNATIVE_SETTINGS_MODE_LOOP:
+          if (state->loop_cv_mode == 0) {
+            state->loop_cv_mode = 1; // loop length cv
+          } else if (state->loop_cv_mode == 1) {
+            state->loop_cv_mode = 2; // loop start position cv
+          } else {
+            state->loop_cv_mode = 0;
+          }
+          break;
+        case ALTERNATIVE_SETTINGS_MODE_QUANTIZER_SCALE:
+          if (state->quantizer_cv_mode == 0) {
+            state->quantizer_cv_mode = 1; // x quantizer scale select cv
+          } else {
+            state->quantizer_cv_mode = 0;
+          }
+          break;
+        case ALTERNATIVE_SETTINGS_MODE_QUANTIZER_ROOT:
+          if (state->root_cv_mode == 0) {
+            state->root_cv_mode = 1; // x quantizer adding root offset 1v/oct cv
+          } else if (state->root_cv_mode == 1) {
+            state->root_cv_mode = 2; // x quantizer reflecting root 1v/oct cv
+          } else {
+            state->root_cv_mode = 0;
+          }
+          break;
       }
-      saveload_confirmed_tick_count_ = 0;
+
       ignore_release_[SWITCH_X_RANGE] = true;
-      mode_ = UI_MODE_SAVELOAD_CONFIRMED;
-      ExitAdditionalAlternateKnobMapping();
-      SaveState();
       return;
     }
     if (e.control_id == SWITCH_X_MODE) {
-      // change quantizer root cv mode
-      if (e.data >= kLongPressDuration) {
-        if (state->root_cv_mode) {
-          state->root_cv_mode = 0; // normal x range cv
-        }
-      } else {
-        if (state->root_cv_mode == 1) {
-          state->root_cv_mode = 2; // x quantizer reflecting root 1v/oct cv
-        } else {
-          state->root_cv_mode = 1; // x quantizer adding root offset 1v/oct cv
-        }
-      }
-      saveload_confirmed_tick_count_ = 0;
       ignore_release_[SWITCH_X_MODE] = true;
-      mode_ = UI_MODE_SAVELOAD_CONFIRMED;
-      ExitAdditionalAlternateKnobMapping();
-      SaveState();
       return;
     }
     if (e.control_id == SWITCH_T_MODEL) {
-      // change loop cv mode
-      if (e.data >= kLongPressDuration) {
-        if (state->loop_cv_mode) {
-          state->loop_cv_mode = 0; // normal t rate cv
-        }
-      } else {
-        if (state->loop_cv_mode == 1) {
-          state->loop_cv_mode = 2; // loop start position cv
-        } else {
-          state->loop_cv_mode = 1; // loop length cv
-        }
-      }
-      saveload_confirmed_tick_count_ = 0;
       ignore_release_[SWITCH_T_MODEL] = true;
-      mode_ = UI_MODE_SAVELOAD_CONFIRMED;
-      ExitAdditionalAlternateKnobMapping();
-      SaveState();
       return;
     }
   }
@@ -538,7 +654,8 @@ void Ui::OnSwitchReleased(const Event& e) {
           SaveState();
         } else {
           if (e.data >= kMiddlePressDuration) {
-            mode_ = UI_MODE_SAVELOAD;
+            alternative_settings_mode_ = 0;
+            mode_ = UI_MODE_ALTERNATIVE;
             ignore_release_[SWITCH_T_RANGE] = true;
             EnterAdditionalAlternateKnobMapping();
           } else if (switches_.pressed(SWITCH_T_MODEL)) { // pressing T model and T range
@@ -676,21 +793,21 @@ void Ui::UpdateHiddenParameters() {
 }
 
 void Ui::EnterAdditionalAlternateKnobMapping() {
-  for (int j = 0; j < ADDITIONAL_ALTERNATE_KNOB_LAST; ++j) {
-    AdditionalAlternateKnobMapping additional_mapping = additional_alternate_knob_mappings_[j];
-    int i = additional_mapping.adc_parameter; 
-    cv_reader_->mutable_channel(i)->LockPot();
-  }
-  additional_alternate_knob_mapping_mode_ = true;
+  // for (int j = 0; j < ADDITIONAL_ALTERNATE_KNOB_LAST; ++j) {
+  //   AdditionalAlternateKnobMapping additional_mapping = additional_alternate_knob_mappings_[j];
+  //   int i = additional_mapping.adc_parameter; 
+  //   cv_reader_->mutable_channel(i)->LockPot();
+  // }
+  // additional_alternate_knob_mapping_mode_ = true;
 }
 
 void Ui::ExitAdditionalAlternateKnobMapping() {
-  for (int j = 0; j < ADDITIONAL_ALTERNATE_KNOB_LAST; ++j) {
-    AdditionalAlternateKnobMapping additional_mapping = additional_alternate_knob_mappings_[j];
-    int i = additional_mapping.adc_parameter; 
-    cv_reader_->mutable_channel(i)->UnlockPot();
-  }
-  additional_alternate_knob_mapping_mode_ = false;
+  // for (int j = 0; j < ADDITIONAL_ALTERNATE_KNOB_LAST; ++j) {
+  //   AdditionalAlternateKnobMapping additional_mapping = additional_alternate_knob_mappings_[j];
+  //   int i = additional_mapping.adc_parameter; 
+  //   cv_reader_->mutable_channel(i)->UnlockPot();
+  // }
+  // additional_alternate_knob_mapping_mode_ = false;
 }
 
 void Ui::DoEvents() {

@@ -53,8 +53,9 @@ enum UiMode {
   UI_MODE_CALIBRATION_3,
   UI_MODE_CALIBRATION_4,
   UI_MODE_PANIC,
-  UI_MODE_SAVELOAD,
-  UI_MODE_SAVELOAD_CONFIRMED,
+  UI_MODE_ALTERNATIVE,
+  UI_MODE_ALTERNATIVE_CONFIRMED,
+  UI_MODE_ALTERNATIVE_BOOTUP
 };
 
 enum FactoryTestingCommand {
@@ -82,6 +83,37 @@ struct AdditionalAlternateKnobMapping {
   AdcParameter adc_parameter;
   Switch unlock_switch;
   uint8_t* destination;
+};
+
+enum AlternativeSettingsMode {
+  ALTERNATIVE_SETTINGS_MODE_RESET_IN,
+  ALTERNATIVE_SETTINGS_MODE_LOOP,
+  ALTERNATIVE_SETTINGS_MODE_QUANTIZER_SCALE,
+  ALTERNATIVE_SETTINGS_MODE_QUANTIZER_ROOT,
+  ALTERNATIVE_SETTINGS_MODE_COUNT, // dummy
+};
+
+enum AlternativeSettingsResetIn {
+  ALTERNATIVE_SETTINGS_RESET_IN_NORMAL,
+  ALTERNATIVE_SETTINGS_RESET_IN_RESET,
+  ALTERNATIVE_SETTINGS_RESET_IN_HOLD,
+};
+
+enum AlternativeSettingsLoop {
+  ALTERNATIVE_SETTINGS_LOOP_NORMAL,
+  ALTERNATIVE_SETTINGS_LOOP_LENGTH_IN,
+  ALTERNATIVE_SETTINGS_LOOP_POS_IN,
+};
+
+enum AlternativeSettingsQuantizerScale {
+  ALTERNATIVE_SETTINGS_QUANTIZER_SCALE_NORMAL,
+  ALTERNATIVE_SETTINGS_QUANTIZER_SCALE_IN,
+};
+
+enum AlternativeSettingsQuantizerRoot {
+  ALTERNATIVE_SETTINGS_QUANTIZER_ROOT_NORMAL,
+  ALTERNATIVE_SETTINGS_QUANTIZER_ROOT_IN,
+  ALTERNATIVE_SETTINGS_QUANTIZER_ROOT_IN_WO_OFFSET,
 };
 
 class Ui {
@@ -129,6 +161,8 @@ class Ui {
     save_slot_index_ = -1;
     load_slot_index_ = -1;
   }
+
+  inline void UpdateLEDsAlternativeValues(int value);
 
  private:
   void UpdateLEDs();
@@ -178,6 +212,11 @@ class Ui {
 
   bool additional_alternate_knob_mapping_mode_;
   
+  uint16_t alternative_bootup_count_;
+  uint16_t alternative_led_blink_;
+  uint16_t alternative_led_count_;
+  uint16_t alternative_settings_mode_;
+
   DISALLOW_COPY_AND_ASSIGN(Ui);
 };
 

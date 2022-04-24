@@ -1,50 +1,91 @@
-# Marbles alternative firmware v08
+# Marbles alternative firmware v09
 
 This firmware adds some functions to Marbles v1.2+.
 
+## alternative settings mode
+
 - T rate cv input can work as deja vu loop length select (two alternative modes).
-- activate new (hidden) Markov algorithm of T mode.
 - X spread cv input can work as X quantizer root select (two alternative modes).
 - T jitter cv input can work as X quantizer scale slot select.
 - X external clock input can work as T trigger reset or T gate hold.
-- set loop start position.
 - save/load loop sequence in volatile memory (RAM).
+
+## additional function in normal mode
+
+- activate new (hidden) Markov algorithm of T mode.
 
 ## Cheat sheet
 
 ![image](marbles/doc/manual.png?raw=true "image")
 
-- Alternative functions
+- Enter alternative settings mode
 
-|alternative function |normal function |operation |alt modes |
-|---|---|---|---|
-|Loop length cv in / Loop start pos knob |T rate cv in / Loop length knob |long-press B then press E |Loop start position cv in |
-|Reset trigger in |X clock in|long-press B then press O |Hold gate in |
-|Quantizer scale select cv in |T jitter cv in|long-press B then press J |- |
-|Quantizer root cv in |X spread cv in|long-press B then press N |Quantizer root cv in (without offset) |
-|Save loop sequence |- |long-press B then press F |- |
-|Load loop sequence |- |long-press B then press G |- |
-|Reset all from alternative to normal |- |long-press B then long-press B |- |
+Long press t range button (**B**)
 
-(For setting "alt modes", repeat the "operation".)
+(In the alternative settings mode,
 
-(In "Reset trigger in" or "Hold gate in" mode, please always insert jack to X clock in.)
+t deja vu LED, x deja vu LED and external input LED are animated.)
 
-- Activate hidden function
+- Edit alternative settings
 
-|function |operation |alt modes |
-|---|---|---|
-|T model "Markov algorithm" |Hold E and Press B |- |
+In the alternative settings mode,
 
-- Deprecated alternative function
+Change current alternative setting target : Press t range button (**B**)
 
-It will be removed at next alternative firmware release.
+Change current alternative setting value : Press x range button (**J**)
 
-|alternative function |normal function |operation |alt modes |
-|---|---|---|---|
-|Loop start pos knob |Loop length knob |long-press B |- |
+(changed values are reflected after exiting alternative settings mode)
+
+(alternative setting target is represented by t mode LED and x mode LED)
+
+(alternative setting value is represented by t range LED and x range LED)
+
+Below remarks: (G: Green, Y: Yellow, R: Red)
+
+| normal function | alternative function | t mode LED | x mode LED | t range LED | x range LED |
+|---|---|---|---|---|---|
+| X clock in | (same as normal) | G | G | G | G |
+| X clock in | Reset trigger in (please always insert jack to X clock in) | G | G | G | Y |
+| X clock in | Hold gate in (please always insert jack to X clock in) | G | G | G | R |
+| T rate cv in / Loop length knob | (same as normal) | G | Y | G | G |
+| T rate cv in / Loop length knob | Loop length cv in / Loop start pos knob | G | Y | G | Y |
+| T rate cv in / Loop length knob | Loop start pos cv in / Loop length knob | G | Y | G | R |
+| T jitter cv in | (same as normal) | G | R | G | G |
+| T jitter cv in | Quantizer scale select cv in | G | R | G | Y |
+| X spread cv in | (same as normal) | Y | G | G | G |
+| X spread cv in | Quantizer root cv in | Y | G | G | Y |
+| X spread cv in | Quantizer root cv in (without offset) | Y | G | G | R |
+
+- Save loop sequence
+
+In the alternative settings mode,
+
+Press deja vu t button (**F**)
+
+- Load loop sequence
+
+In the alternative settings mode,
+
+Press deja vu x button (**G**)
+
+- Exit alternative settings mode
+
+In the alternative settings mode,
+
+Press external input button (**O**)
+
+- Reset all alternative settings and exit alternative settings mode
+
+In the alternative settings mode,
+
+Long press external input button (**O**)
 
 ## Change log
+
+### v09
+
+- Change user interface for alternative settings.
+- Remove deprecated function of alternative deja vu length knob during in the alternative settings mode.
 
 ### v08
 
@@ -94,28 +135,13 @@ During deja vu loop cv input mode, T rate setting is set by T rate knob.
 
 The deja vu loop cv input mode setting is saved to non volatile memory.
 
-Play scenario is:
-
 1. (NEW FUNCTION) Set T rate cv input alternative mode
 
-  - (In "alternative setting edit" mode, "T mode switch" works as setting T rate cv input alternative mode.)
+  - T rate cv input works as deja vu loop length cv mode. In this mode, deja vu knob act as deja vu loop start position (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16) knob. This loop start position value is active only in this mode.
 
-  - 1a. long-press "T rate switch".
-  - 1b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
-  - 1c. push "T mode switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
-  - T rate cv input works as deja vu loop length cv mode (Type A). In this mode, deja vu knob act as deja vu loop start position (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16) knob. This loop start position value is active only in this mode.
+2. (NEW FUNCTION) Set T rate cv input alternative mode
 
->  - Repeat above 1a, 1b and 1c.
->  - T rate cv input works as deja vu loop start position cv mode (Type B). In this mode, deja vu knob act as no functional.
->
->  - Each repeating above 1a, 1b and 1c, T rate cv mode changes to Type A or Type B.
-
-2. Set T rate cv input normal mode
-
-  - 2a. long-press "T rate switch".
-  - 2b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
-  - 2c. long-press "T mode switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
-  - T rate cv input works as normal T rate cv input mode.
+  - T rate cv input works as deja vu loop start position cv mode. In this mode, deja vu knob act as no functional.
 
 ## T trigger reset (using X external clock input)
 
@@ -131,28 +157,13 @@ The X external clock input mode setting is saved to non volatile memory.
 
 Play scenario is:
 
-1. Connect something to X external clock input jack. (It's important.)
+1. (NEW FUNCTION) Set X external clock input alternative mode
+
+  - X external clock input works as T trigger rising edge reset mode. When trigger/gate rising edge signal detected at X external clock input, internal T and X sequence are resetted.
 
 2. (NEW FUNCTION) Set X external clock input alternative mode
 
-  - (In "alternative setting edit" mode, "external processing switch" works as setting X external clock input alternative mode.)
-
-  - 2a. long-press "T rate switch".
-  - 2b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
-  - 2c. push "external processing switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
-  - X external clock input works as T trigger rising edge reset mode. When trigger/gate rising edge signal detected at X external clock input, internal T and X sequence are resetted.
-
->  - Repeat above 2a, 2b and 2c.
->  - X external clock input works as T gate hold mode. During trigger/gate ON signal at X external clock input, internal T and X sequence are holded (in another word, pause and resume behavior).
->
->  - Each repeating above 2a, 2b and 2c, X external clock input mode changes to T trigger rising edge reset mode or T gate hold mode.
-
-3. Set X external clock input normal mode
-
-  - 3a. long-press "T rate switch".
-  - 3b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
-  - 3c. long-press "external processing switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
-  - X external clock input works as normal X external clock mode.
+ - X external clock input works as T gate hold mode. During trigger/gate ON signal at X external clock input, internal T and X sequence are holded (in another word, pause and resume behavior).
 
 ## X Quantizer scale select cv (using T jitter cv input)
 
@@ -175,23 +186,9 @@ Selected quantizer scale slot value by X quantizer select cv input doesn't overw
 
 The T jitter cv input mode setting is saved to non volatile memory.
 
-Play scenario is:
-
 1. (NEW FUNCTION) Set T jitter cv input alternative mode
 
-  - (In "alternative setting edit" mode, "X range switch" works as setting T jitter cv input alternative mode.)
-
-  - 1a. long-press "T rate switch".
-  - 1b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
-  - 1c. push "X range switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
   - T jitter cv input works as X quantizer slot select mode.
-
-2. Set T jitter cv input normal mode
-
-  - 2a. long-press "T rate switch".
-  - 2b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
-  - 2c. long-press "X range switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
-  - T jitter cv input works as normal T jitter cv input mode.
 
 ## X Quantizer root cv (using X spread cv input)
 
@@ -201,32 +198,17 @@ During X quantizer root cv input mode, X spread setting is set by X spread knob.
 
 The X spread cv input mode setting is saved to non volatile memory.
 
-Play scenario is:
-
 1. (NEW FUNCTION) Set X spread cv input alternative mode
 
-  - (In "alternative setting edit" mode, "X mode switch" works as setting X spread cv input alternative mode.)
-
-  - 1a. long-press "T rate switch".
-  - 1b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
-  - 1c. push "X mode switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
   - X spread cv input works as X quantizer root mode Type A (adding offset root mode).
 
->  - Repeat above 1a, 1b and 1c.
->  - X spread cv input works as X quantizer root mode Type B (not adding offset but reflect root).
->
->  - Each repeating above 1a, 1b and 1c, X spread cv input mode changes to X quantizer root mode Type A or Type B.
+2. (NEW FUNCTION) Set X spread cv input alternative mode
 
-2. Set X spread cv input normal mode
-
-  - 2a. long-press "T rate switch".
-  - 2b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
-  - 2c. long-press "X mode switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
-  - X spread cv input works as normal X spread cv input mode.
+ - X spread cv input works as X quantizer root mode Type B (not adding offset but reflect root).
 
 ## Save/Load loop sequence in volatile memory (RAM)
 
-We can explore random rhythm and return to the previous discovered  random rhythm.
+We can explore random rhythm and return to the previous discovered random rhythm.
 
 Play scenario is:
 
@@ -234,14 +216,14 @@ Play scenario is:
 2. Lock the rhythm by setting "deja vu knob" to 50%(12 o'clock) with deja vu enabled.
 3. (NEW FUNCTION) Save the rhythm
   - 3a. long-press "T rate switch".
-  - 3b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
+  - 3b. then LEDs run animation. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
   - 3c. then press "T deja vu switch".
   - 3d. then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents saving is executed and "alternative setting edit" mode exited.)
 4. Explore another random rhythm by changing "deja vu knob" or switching deja vu enabled-disabled.
 5. Lock the rhythm by setting "deja vu knob" to 50% with deja vu enabled.
 6. (NEW FUNCTION) Load the previous rhythm
   - 6a. long-press "T rate switch".
-  - 6b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
+  - 6b. then LEDs run animation. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
   - 6c. then press "X deja vu switch".
   - 6d. then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents loading is executed and "alternative setting edit" mode exited.)
 
@@ -264,44 +246,21 @@ Play scenario is:
   - 2a. press or long-press "T mode switch".
   - T mode becomes normal "drum algorithm" or "three state algorithm".
 
-## Set loop start position
-
-(Deprecated. It will be removed at next firmware release.)
-
-We can select short length loop patterns from locked random rhythm.
-
-The loop start position setting is saved to non volatile memory.
-
-Play scenario is:
-
-1. Explore random rhythm.
-2. Lock the rhythm by setting "deja vu knob" to 50%(12 o'clock) with deja vu enabled.
-3. Set deja vu loop length using "loop length knob".
-
-4. (NEW FUNCTION) Set deja vu loop start position
-
-  - (In "alternative setting edit" mode, "loop length knob" works as setting loop start position.)
-
-  - 4a. long-press "T rate switch".
-  - 4b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
-  - 4c. turn "loop length knob" to set loop start position.
-  - 4d. push "T rate switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
-
 ## Notes
 
-### Canceling "alternative setting edit"
+### Exit/Cancel "alternative setting edit"
 
-After long-press "T rate switch" ("T rate LED" is blinking), for canceling "alternative setting edit", press "T rate switch".
+After long-press "T rate switch" (LED is blinking), for exiting/canceling "alternative setting edit", press "x external input button".
 
 ### Save timing of alternative mode setting
 
-Saving alternative mode setting (loop start position, X external clock input mode, T jitter cv input mode, X spread cv input mode, T rate cv input mode) to non volatile memory will be done automatically when exiting alternative setting edit mode.
+Saving alternative mode setting (X external clock input mode, T jitter cv input mode, X spread cv input mode, T rate cv input mode) to non volatile memory will be done automatically when exiting/canceling alternative setting edit mode.
 
 ### Resetting operation for returning all alternative settings value to default value
 
   - 1a. long-press "T rate switch".
-  - 1b. then "T rate LED" becomes blink. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
-  - 1c. long-press "T rate switch". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
+  - 1b. then LEDs run animation. (and detouch from the switch.) (It represents currently in "alternative setting edit" mode.)
+  - 1c. long-press "x external input button". then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.)
   - all alternative settings value returns to default value.
 
 =======
