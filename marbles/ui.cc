@@ -331,32 +331,13 @@ void Ui::UpdateLEDs() {
         alternative_bootup_count_ = 1;
       }
 
-      if (alternative_led_blink_ != blink) {
+      if (alternative_led_blink_ != slow_blink) {
         if (alternative_bootup_count_ >= 3) { // end bootup
           mode_ = UI_MODE_NORMAL;
           break;
         }
 
-        switch (alternative_led_count_ % 3) {
-          case 0:
-            leds_.set(LED_T_DEJA_VU, LED_COLOR_YELLOW);
-            leds_.set(LED_X_DEJA_VU, LED_COLOR_OFF);
-            leds_.set(LED_X_EXT, LED_COLOR_OFF);
-            break;
-          case 1:
-            leds_.set(LED_T_DEJA_VU, LED_COLOR_OFF);
-            leds_.set(LED_X_DEJA_VU, LED_COLOR_YELLOW);
-            leds_.set(LED_X_EXT, LED_COLOR_OFF);
-            break;
-          case 2:
-          default:
-            leds_.set(LED_T_DEJA_VU, LED_COLOR_OFF);
-            leds_.set(LED_X_DEJA_VU, LED_COLOR_OFF);
-            leds_.set(LED_X_EXT, LED_COLOR_YELLOW);
-            break;
-        }
-
-        alternative_led_blink_ = blink;
+        alternative_led_blink_ = slow_blink;
         if (alternative_led_count_ >= 2) {
           alternative_led_count_ = 0;
           alternative_bootup_count_ += 1;
@@ -364,35 +345,56 @@ void Ui::UpdateLEDs() {
           alternative_led_count_ += 1;
         }
       }
+
+      switch (alternative_led_count_ % 3) {
+        case 0:
+          leds_.set(LED_T_DEJA_VU, LED_COLOR_GREEN);
+          leds_.set(LED_X_DEJA_VU, LED_COLOR_OFF);
+          leds_.set(LED_X_EXT, LED_COLOR_OFF);
+          break;
+        case 1:
+          leds_.set(LED_T_DEJA_VU, LED_COLOR_OFF);
+          leds_.set(LED_X_DEJA_VU, LED_COLOR_GREEN);
+          leds_.set(LED_X_EXT, LED_COLOR_OFF);
+          break;
+        case 2:
+          leds_.set(LED_T_DEJA_VU, LED_COLOR_OFF);
+          leds_.set(LED_X_DEJA_VU, LED_COLOR_OFF);
+          leds_.set(LED_X_EXT, LED_COLOR_GREEN);
+          break;
+        default:
+          break;
+      }
       break;
 
     case UI_MODE_ALTERNATIVE:
-      if (alternative_led_blink_ != blink) {
-        switch (alternative_led_count_ % 3) {
-          case 0:
-            leds_.set(LED_T_DEJA_VU, LED_COLOR_YELLOW);
-            leds_.set(LED_X_DEJA_VU, LED_COLOR_OFF);
-            leds_.set(LED_X_EXT, LED_COLOR_OFF);
-            break;
-          case 1:
-            leds_.set(LED_T_DEJA_VU, LED_COLOR_OFF);
-            leds_.set(LED_X_DEJA_VU, LED_COLOR_YELLOW);
-            leds_.set(LED_X_EXT, LED_COLOR_OFF);
-            break;
-          case 2:
-          default:
-            leds_.set(LED_T_DEJA_VU, LED_COLOR_OFF);
-            leds_.set(LED_X_DEJA_VU, LED_COLOR_OFF);
-            leds_.set(LED_X_EXT, LED_COLOR_YELLOW);
-            break;
-        }
-
-        alternative_led_blink_ = blink;
+      if (alternative_led_blink_ != slow_blink) {
+        alternative_led_blink_ = slow_blink;
         if (alternative_led_count_ >= 2) {
           alternative_led_count_ = 0;
         } else {
           alternative_led_count_ += 1;
         }
+      }
+
+      switch (alternative_led_count_ % 3) {
+        case 0:
+          leds_.set(LED_T_DEJA_VU, LED_COLOR_GREEN);
+          leds_.set(LED_X_DEJA_VU, LED_COLOR_OFF);
+          leds_.set(LED_X_EXT, LED_COLOR_OFF);
+          break;
+        case 1:
+          leds_.set(LED_T_DEJA_VU, LED_COLOR_OFF);
+          leds_.set(LED_X_DEJA_VU, LED_COLOR_GREEN);
+          leds_.set(LED_X_EXT, LED_COLOR_OFF);
+          break;
+        case 2:
+          leds_.set(LED_T_DEJA_VU, LED_COLOR_OFF);
+          leds_.set(LED_X_DEJA_VU, LED_COLOR_OFF);
+          leds_.set(LED_X_EXT, LED_COLOR_GREEN);
+          break;
+        default:
+          break;
       }
 
       switch (alternative_settings_mode_) {
@@ -412,10 +414,11 @@ void Ui::UpdateLEDs() {
           UpdateLEDsAlternativeValues(state.quantizer_cv_mode);
           break;
         case ALTERNATIVE_SETTINGS_MODE_QUANTIZER_ROOT:
-        default:
           leds_.set(LED_T_MODEL, LED_COLOR_YELLOW);
-          leds_.set(LED_X_CONTROL_MODE, LED_COLOR_RED);
+          leds_.set(LED_X_CONTROL_MODE, LED_COLOR_GREEN);
           UpdateLEDsAlternativeValues(state.root_cv_mode);
+          break;
+        default:
           break;
       }
       break;
@@ -558,6 +561,10 @@ void Ui::OnSwitchReleased(const Event& e) {
             state->loop_cv_mode = 1; // loop length cv
           } else if (state->loop_cv_mode == 1) {
             state->loop_cv_mode = 2; // loop start position cv
+          } else if (state->loop_cv_mode == 2) {
+            state->loop_cv_mode = 3; // loop start position cv with fixed end position 16
+          } else if (state->loop_cv_mode == 3) {
+            state->loop_cv_mode = 4; // normal t rate cv, loop start position knob with fixed end position 16
           } else {
             state->loop_cv_mode = 0;
           }
@@ -577,6 +584,8 @@ void Ui::OnSwitchReleased(const Event& e) {
           } else {
             state->root_cv_mode = 0;
           }
+          break;
+        default:
           break;
       }
 

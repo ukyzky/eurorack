@@ -317,32 +317,50 @@ void Process(IOBuffer::Block* block, size_t size) {
   
   int deja_vu_length;
   int deja_vu_start;
-  if (state.loop_cv_mode == 2) { // loop start position cv
+  if (state.loop_cv_mode == 4) {
+    // normal T rate cv input
+    // loop start position knob with fixed end position 16
+    deja_vu_start = deja_vu_length_quantizer.Lookup(
+      loop_length_cv,
+      parameters[ADC_CHANNEL_DEJA_VU_LENGTH],
+      sizeof(loop_length_cv) / sizeof(int));
+    deja_vu_length = 16 - (deja_vu_start - 1);
+  } else if (state.loop_cv_mode == 3) {
+    // loop start position cv with fixed end position 16
+    // loop start cv attenuverter knob
+    deja_vu_start = deja_vu_length_quantizer.Lookup(
+      loop_length_cv,
+      (cv_reader.channel(ADC_CHANNEL_T_RATE).scaled_raw_cv() / 60.0f) * (parameters[ADC_CHANNEL_DEJA_VU_LENGTH] - 0.5f) * 2.f,
+      sizeof(loop_length_cv) / sizeof(int));
+    deja_vu_length = 16 - (deja_vu_start - 1);
+  } else if (state.loop_cv_mode == 2) {
+    // loop start position cv
+    // deja vu length knob act as normal deja vu length knob
     deja_vu_length = deja_vu_length_quantizer.Lookup(
       loop_length,
       parameters[ADC_CHANNEL_DEJA_VU_LENGTH],
       sizeof(loop_length) / sizeof(int));
-
     deja_vu_start = deja_vu_length_quantizer.Lookup(
       loop_length_cv,
-      cv_reader.channel(ADC_CHANNEL_T_RATE).scaled_raw_cv() / 60.0f, // ignore deja vu length knob in alternative mode
+      cv_reader.channel(ADC_CHANNEL_T_RATE).scaled_raw_cv() / 60.0f,
       sizeof(loop_length_cv) / sizeof(int));
-  } else if (state.loop_cv_mode == 1) { // loop length cv
+  } else if (state.loop_cv_mode == 1) {
+    // loop length cv
+    // deja vu length knob act as deja vu start position (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16) knob
     deja_vu_length = deja_vu_length_quantizer.Lookup(
       loop_length_cv,
       cv_reader.channel(ADC_CHANNEL_T_RATE).scaled_raw_cv() / 60.0f,
       sizeof(loop_length_cv) / sizeof(int));
-
     deja_vu_start = deja_vu_length_quantizer.Lookup(
       loop_length_cv,
-      parameters[ADC_CHANNEL_DEJA_VU_LENGTH], // deja vu length knob act as deja vu start position (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16) knob
+      parameters[ADC_CHANNEL_DEJA_VU_LENGTH],
       sizeof(loop_length_cv) / sizeof(int));
-  } else { // normal t rate cv
+  } else {
+    // normal t rate cv
     deja_vu_length = deja_vu_length_quantizer.Lookup(
       loop_length,
       parameters[ADC_CHANNEL_DEJA_VU_LENGTH],
       sizeof(loop_length) / sizeof(int));
-
     deja_vu_start = deja_vu_length_quantizer.Lookup(
       loop_length,
       state.loop_start / 255.f,
@@ -351,7 +369,7 @@ void Process(IOBuffer::Block* block, size_t size) {
 
   t_generator.set_model(TGeneratorModel(state.t_model));
   t_generator.set_range(TGeneratorRange(state.t_range));
-  if (state.loop_cv_mode == 0) {
+  if (state.loop_cv_mode == 0 || state.loop_cv_mode == 4) {
   t_generator.set_rate(parameters[ADC_CHANNEL_T_RATE]);
   } else {
     t_generator.set_rate(cv_reader.channel(ADC_CHANNEL_T_RATE).pot());
