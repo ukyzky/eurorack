@@ -1,10 +1,10 @@
-# Marbles alternative firmware v09
+# Marbles alternative firmware v09.1
 
-This firmware adds some functions to Marbles v1.2+.
+This firmware adds some functions to Marbles latest v1.2+ firmware.
 
 ## alternative settings mode
 
-- X external clock input can work as T trigger reset or T gate hold.
+- X external clock input can work as T trigger reset or T gate hold. (In the reset/hold mode, setting option of internal self patch from T1/T2/T3 to X clock added.)
 - T rate cv input can work as deja vu loop length or start position select (four alternative modes).
 - T jitter cv input can work as X quantizer scale slot select.
 - X spread cv input can work as X quantizer root select (two alternative modes).
@@ -34,27 +34,31 @@ This firmware adds some functions to Marbles v1.2+.
 
   (changed values are reflected after exiting alternative settings mode)
 
-  (alternative setting target is represented by t mode LED and X mode LED)
+  **(alternative setting target is represented by t mode LED and X mode LED)**
 
-  (alternative setting type is represented by t range LED and X range LED)
+  *(alternative setting type is represented by t range LED and X range LED)*
 
   Below remarks: (G: Green, Y: Yellow, R: Red)
 
-| normal function | alternative function | t mode LED | X mode LED | t range LED | X range LED |
-|---|---|---|---|---|---|
-| X clock in | (same as normal) | G | G | G | G |
-| X clock in | Reset trigger in (please always insert jack to X clock in) | G | G | G | Y |
-| X clock in | Hold gate in (please always insert jack to X clock in) | G | G | G | R |
-| T rate cv in / Loop length knob | (same as normal) | G | Y | G | G |
-| T rate cv in / Loop length knob | Loop length cv in / Loop start pos knob | G | Y | G | Y |
-| T rate cv in / Loop length knob | Loop start pos cv in / Loop length knob | G | Y | G | R |
-| T rate cv in / Loop length knob | Loop start pos cv in / Loop start pos cv attenuverter knob (Loop end pos is fixed at 16. So loop start pos and length are changed at the same time.) | G | Y | Y | G |
-| T rate cv in / Loop length knob | T rate cv in / Loop start pos knob (Loop end pos is fixed at 16. So loop start pos and length are changed at the same time. It's inspired from Serge Sequencer.) | G | Y | Y | Y |
-| T jitter cv in | (same as normal) | G | R | G | G |
-| T jitter cv in | Quantizer scale select cv in | G | R | G | Y |
-| X spread cv in | (same as normal) | Y | G | G | G |
-| X spread cv in | Quantizer root cv in | Y | G | G | Y |
-| X spread cv in | Quantizer root cv in (without offset) | Y | G | G | R |
+| normal function | alternative function | **t mode LED** | **X mode LED** | *t range LED* | *X range LED* | *(Type)* |
+|---|---|---|---|---|---|---|
+| X clock in | (same as normal) | G | G | G | G | 0 |
+| X clock in | Reset trigger in | G | G | G | Y | 1 |
+| X clock in | Hold gate in | G | G | G | R | 2 |
+| T rate cv in / Loop length knob | (same as normal) | G | Y | G | G | 0 |
+| T rate cv in / Loop length knob | Loop length cv in / Loop start pos knob | G | Y | G | Y | 1 |
+| T rate cv in / Loop length knob | Loop start pos cv in / Loop length knob | G | Y | G | R | 2 |
+| T rate cv in / Loop length knob | Loop start pos cv in / Loop start end pos offset(rotate) knob (Loop end pos is fixed at 16 when offset is 0. So loop start pos and length are changed at the same time.) | G | Y | Y | G | 3 |
+| T rate cv in / Loop length knob | T rate cv in / Loop start pos knob (Loop end pos is fixed at 16. So loop start pos and length are changed at the same time. It's inspired from Serge Sequencer.) | G | Y | Y | Y | 4 |
+| T jitter cv in | (same as normal) | G | R | G | G | 0 |
+| T jitter cv in | Quantizer scale select cv in | G | R | G | Y | 1 |
+| X spread cv in | (same as normal) | Y | G | G | G | 0 |
+| X spread cv in | Quantizer root cv in | Y | G | G | Y | 1 |
+| X spread cv in | Quantizer root cv in (without offset) | Y | G | G | R | 2 |
+| X clock internal source in reset/hold mode | (same as normal) | Y | Y | G | G | 0 |
+| X clock internal source in reset/hold mode | T1 | Y | Y | G | Y | 1 |
+| X clock internal source in reset/hold mode | T2 | Y | Y | G | R | 2 |
+| X clock internal source in reset/hold mode | T3 | Y | Y | Y | G | 3 |
 
 - Save loop sequence
 
@@ -87,6 +91,12 @@ This firmware adds some functions to Marbles v1.2+.
   - hold t mode button **[E]** and press T rate button **[B]**
 
 ## Change log
+
+### v09.1
+
+- Add setting internal self patch from T1/T2/T3 to X clock (for X external clock input set as T trigger reset or T gate hold).
+- Remove limitation of "always insert jack to X clock in" on reset/hold mode. So no longer need to take care of jack for X clock on reset/hold mode.
+- **(breaking change)** change "T rate cv in / Loop length knob" setting Type3 Loop length knob behavior from loop start pos cv attenuverter to loop start/end pos offset(rotate) (0 to 15).
 
 ### v09
 
@@ -159,7 +169,7 @@ The deja vu loop cv input mode setting is saved to non volatile memory.
 
   - T rate cv input works as deja vu loop start position cv (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16) mode (loop end position is fixed at 16. So loop start position and length are controlled simultaneously). It's inspired from Serge Sequencer.
   - For example, loop start position is 1 then loop length is 16. Loop start position is 16 then loop length is 1.
-  - deja vu length knob acts as deja vu loop start position cv attenuverter (CCW is -1x, CW is 1x, center is 0x). So generally deja vu length knob position is CW.
+  - deja vu length knob acts as deja vu loop start/end position offset(rotate) (CCW is 0, CW is 15). So generally deja vu length knob position is CCW. Loop start position is calculated by adding loop start position cv value (1 to 16) and loop start position offset knob value (0 to 15). If calculated value overflow 16, the value is subtracted by 16.
   - This loop start position value is active only in this mode.
 
 4. Type4 (added at v9)
@@ -178,10 +188,6 @@ And we can use X external clock input as T gate hold mode (x is clocked by inter
 
 The X external clock input mode setting is saved to non volatile memory.
 
-> Notes:
-> 
-> When the X external clock alternative mode is active, please connect jack to X external clock input socket (not necessary signal but necessary jack). If no connection, deja vu lock will become unexpected behavior.
-
 1. Type1
 
   - X external clock input works as T trigger rising edge reset mode. When trigger/gate rising edge signal detected at X external clock input, internal T and X sequence are resetted.
@@ -189,6 +195,24 @@ The X external clock input mode setting is saved to non volatile memory.
 2. Type2
 
  - X external clock input works as T gate hold mode. During trigger/gate ON signal at X external clock input, internal T and X sequence are holded (in another word, pause and resume behavior).
+
+## X clock internal source in T trigger reset/hold mode
+
+When T trigger reset/hold mode is set, self patching from T1/T2/T3 to X clock input is impossible physically.
+
+So as alternative way, in T trigger reset/hold mode, we can set X clock source.
+
+1. Type1
+
+ - T1 is internal patched to X clock.
+
+2. Type2
+
+ - T2 is internal patched to X clock.
+
+3. Type3
+
+ - T3 is internal patched to X clock.
 
 ## X Quantizer scale select cv (using T jitter cv input)
 
@@ -252,6 +276,10 @@ Play scenario is:
   - 6c. then press "X deja vu switch".
   - 6d. then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents loading is executed and "alternative settings" mode exited.)
 
+Notes:
+
+The knobs position values aren't saved/loaded.
+
 ## Activate Markov algorithm of t mode
 
 We can select "Markov algorithm" of t mode.
@@ -296,6 +324,12 @@ Saving alternative settings (X external clock input mode, T jitter cv input mode
   - long-press "X external processing mode button".
   
   Then "T rate LED" becomes fast-blink in a short moment and stop blink. (It represents "alternative setting edit" mode exited.) Then all alternative settings values return to default value.
+
+### Policy of this alternative firmware
+
+- It is based on latest official firmware. (So superlock feature is included.)
+
+- Using the alternative firmware with all normal setting, the behavior is the same as latest official firmware.
 
 =======
 

@@ -216,7 +216,7 @@ void Settings::Init() {
     CONSTRAIN(state_.y_range, 0, 2);
     CONSTRAIN(state_.t_deja_vu, DEJA_VU_OFF, DEJA_VU_LOCKED);
     CONSTRAIN(state_.x_deja_vu, DEJA_VU_OFF, DEJA_VU_LOCKED);
-    CONSTRAIN(state_.x_clock_mode, 0, 2);
+    CONSTRAIN(state_.x_clock_mode, 0, 0xFF);
     CONSTRAIN(state_.quantizer_cv_mode, 0, 1);
     CONSTRAIN(state_.root_cv_mode, 0, 2);
     CONSTRAIN(state_.loop_cv_mode, 0, 4);

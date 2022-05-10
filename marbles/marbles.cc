@@ -281,11 +281,13 @@ void Process(IOBuffer::Block* block, size_t size) {
   GateFlags* xy_clock = block->input[1];
 
   const State& state = settings.state();
+  const uint8_t x_clock_mode = state.x_clock_mode & 0x0F;
+  const uint8_t x_clock_routing_mode = (state.x_clock_mode & 0xF0) >> 4;
 
   // Determine the clock source for the XY section (2%)
   ClockSource xy_clock_source = CLOCK_SOURCE_INTERNAL_T1_T2_T3;
   if (block->input_patched[1]) {
-    if (state.x_clock_mode == 0) {
+    if (x_clock_mode == 0) {
     xy_clock_source = CLOCK_SOURCE_EXTERNAL;
     size_t best_score = 8;
     for (size_t i = 0; i < kNumGateOutputs; ++i) {
@@ -295,6 +297,23 @@ void Process(IOBuffer::Block* block, size_t size) {
         best_score = score;
       }
     }
+    } else {
+      // setting internal routing x clock (T1_T2_T3, T1, T2, T3) for reset/hold mode
+      switch (x_clock_routing_mode) {
+        case 1:
+          xy_clock_source = CLOCK_SOURCE_INTERNAL_T1;
+          break;
+        case 2:
+          xy_clock_source = CLOCK_SOURCE_INTERNAL_T2;
+          break;
+        case 3:
+          xy_clock_source = CLOCK_SOURCE_INTERNAL_T3;
+          break;
+        case 0:
+        default:
+          // CLOCK_SOURCE_INTERNAL_T1_T2_T3 already set.
+          break;
+      }
     }
   }
 
@@ -327,12 +346,19 @@ void Process(IOBuffer::Block* block, size_t size) {
     deja_vu_length = 16 - (deja_vu_start - 1);
   } else if (state.loop_cv_mode == 3) {
     // loop start position cv with fixed end position 16
-    // loop start cv attenuverter knob
+    // loop start/end position offset(rotate) knob (0 to 15)
     deja_vu_start = deja_vu_length_quantizer.Lookup(
       loop_length_cv,
-      (cv_reader.channel(ADC_CHANNEL_T_RATE).scaled_raw_cv() / 60.0f) * (parameters[ADC_CHANNEL_DEJA_VU_LENGTH] - 0.5f) * 2.f,
+      cv_reader.channel(ADC_CHANNEL_T_RATE).scaled_raw_cv() / 60.0f,
       sizeof(loop_length_cv) / sizeof(int));
     deja_vu_length = 16 - (deja_vu_start - 1);
+    deja_vu_start += deja_vu_length_quantizer.Lookup(
+      loop_length_cv,
+      parameters[ADC_CHANNEL_DEJA_VU_LENGTH],
+      sizeof(loop_length_cv) / sizeof(int)) - 1;
+    if (deja_vu_start > 16) {
+      deja_vu_start = deja_vu_start - 16;
+    }
   } else if (state.loop_cv_mode == 2) {
     // loop start position cv
     // deja vu length knob act as normal deja vu length knob
@@ -391,9 +417,9 @@ void Process(IOBuffer::Block* block, size_t size) {
 
   GateFlags* t_reset = NULL;
   bool t_hold = false;
-  if (state.x_clock_mode != 0) {
+  if (block->input_patched[1] && (x_clock_mode != 0)) {
     t_reset = xy_clock;
-    if (state.x_clock_mode == 2) {
+    if (x_clock_mode == 2) {
       t_hold = true;
     }
   }

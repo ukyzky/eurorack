@@ -84,7 +84,8 @@ struct State {
   uint8_t color_blind;
 
   uint8_t loop_start;
-  // x clock mode (0: normal xy_clock mode, 1: t trigger rising edge reset mode, 2: t gate hold mode)
+  // x clock mode (& 0x0F) (0: normal xy_clock mode, 1: t trigger rising edge reset mode, 2: t gate hold mode)
+  // x clock routing mode for reset/hold mode ((& 0xF0) >> 4) (0: T1_T2_T3, 1: T1, 2: T2, 3: T3)
   uint8_t x_clock_mode;
   // quantizer scale cv mode (0: normal t jitter cv input mode, 1: x quantizer scale select cv input mode)
   uint8_t quantizer_cv_mode;
@@ -94,7 +95,7 @@ struct State {
   // 0: normal t rate cv input mode,
   // 1: loop length cv mode,
   // 2: loop start position cv mode,
-  // 3: loop start position cv with end position fixed at 16 mode
+  // 3: loop start position cv with end position fixed at 16, loop start/end position offset(rotate) knob mode
   // 4: normal t rate cv, loop start position knob with end position fixed at 16 mode
   uint8_t loop_cv_mode;
 

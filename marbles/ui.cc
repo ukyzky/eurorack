@@ -401,7 +401,7 @@ void Ui::UpdateLEDs() {
         case ALTERNATIVE_SETTINGS_MODE_RESET_IN:
           leds_.set(LED_T_MODEL, LED_COLOR_GREEN);
           leds_.set(LED_X_CONTROL_MODE, LED_COLOR_GREEN);
-          UpdateLEDsAlternativeValues(state.x_clock_mode);
+          UpdateLEDsAlternativeValues(state.x_clock_mode & 0x0F);
           break;
         case ALTERNATIVE_SETTINGS_MODE_LOOP:
           leds_.set(LED_T_MODEL, LED_COLOR_GREEN);
@@ -417,6 +417,11 @@ void Ui::UpdateLEDs() {
           leds_.set(LED_T_MODEL, LED_COLOR_YELLOW);
           leds_.set(LED_X_CONTROL_MODE, LED_COLOR_GREEN);
           UpdateLEDsAlternativeValues(state.root_cv_mode);
+          break;
+        case ALTERNATIVE_SETTINGS_MODE_X_CLOCK_ROUTING:
+          leds_.set(LED_T_MODEL, LED_COLOR_YELLOW);
+          leds_.set(LED_X_CONTROL_MODE, LED_COLOR_YELLOW);
+          UpdateLEDsAlternativeValues((state.x_clock_mode & 0xF0) >> 4);
           break;
         default:
           break;
@@ -545,15 +550,17 @@ void Ui::OnSwitchReleased(const Event& e) {
       return;
     }
     if (e.control_id == SWITCH_X_RANGE) {
+      const uint8_t x_clock_mode = state->x_clock_mode & 0x0F;
+      const uint8_t x_clock_routing_mode = (state->x_clock_mode & 0xF0) >> 4;
       // change alternative settings value
       switch (alternative_settings_mode_) {
         case ALTERNATIVE_SETTINGS_MODE_RESET_IN:
-          if (state->x_clock_mode == 0) {
-            state->x_clock_mode = 1; // t reset
-          } else if (state->x_clock_mode == 1) {
-            state->x_clock_mode = 2; // t hold
+          if (x_clock_mode == 0) {
+            state->x_clock_mode = (x_clock_routing_mode << 4) | 1; // t reset
+          } else if (x_clock_mode == 1) {
+            state->x_clock_mode = (x_clock_routing_mode << 4) | 2; // t hold
           } else {
-            state->x_clock_mode = 0;
+            state->x_clock_mode = (x_clock_routing_mode << 4) | 0;
           }
           break;
         case ALTERNATIVE_SETTINGS_MODE_LOOP:
@@ -583,6 +590,17 @@ void Ui::OnSwitchReleased(const Event& e) {
             state->root_cv_mode = 2; // x quantizer reflecting root 1v/oct cv
           } else {
             state->root_cv_mode = 0;
+          }
+          break;
+        case ALTERNATIVE_SETTINGS_MODE_X_CLOCK_ROUTING:
+          if (x_clock_routing_mode == 0) {
+            state->x_clock_mode = (1 << 4) | x_clock_mode; // T1
+          } else if (x_clock_routing_mode == 1) {
+            state->x_clock_mode = (2 << 4) | x_clock_mode; // T2
+          } else if (x_clock_routing_mode == 2) {
+            state->x_clock_mode = (3 << 4) | x_clock_mode; // T3
+          } else {
+            state->x_clock_mode = 0 | x_clock_mode; // T1_T2_T3
           }
           break;
         default:
