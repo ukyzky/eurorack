@@ -335,6 +335,7 @@ Saving alternative settings (X external clock input mode, T jitter cv input mode
 
 Mutable Instruments' Eurorack Modules.
 
+* [Blades](http://mutable-instruments.net/modules/blades): Dual multimode filter.
 * [Blinds](http://mutable-instruments.net/modules/blinds): Quad VC-polarizer.
 * [Braids](http://mutable-instruments.net/modules/braids): Macro-oscillator.
 * [Branches](http://mutable-instruments.net/modules/branches): Dual Bernoulli gate.
