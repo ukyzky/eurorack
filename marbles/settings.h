@@ -98,8 +98,16 @@ struct State {
   // 3: loop start position cv with end position fixed at 16, loop start/end position offset(rotate) knob mode
   // 4: normal t rate cv, loop start position knob with end position fixed at 16 mode
   uint8_t loop_cv_mode;
+  // deja vu buffer length mode
+  // 0: normal 16
+  // 1: 128 (from Jthrw's implementation)
+  // 2: 128 (only 2 x2)
+  // 3: 192 (only 3 x2)
+  // 4: 320 (only 5 x2)
+  // 5: 233 (only fibonacci)
+  uint8_t deja_vu_buffer_length_mode;
 
-  uint8_t padding[3];
+  uint8_t padding[2];
 
   enum { tag = 0x54415453 };
 };

@@ -172,7 +172,6 @@ void TGenerator::Init(RandomStream* random_stream, float sr) {
   }
 
   length_ = 0;
-  start_ = 0;
 }
 
 int TGenerator::GenerateComplementaryBernoulli(const RandomVector& x) {

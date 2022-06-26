@@ -37,8 +37,8 @@
 
 namespace marbles {
 
-const int kDejaVuBufferSize = 16;
-const int kHistoryBufferSize = 16;
+const int kDejaVuBufferSize = 320;//16;
+const int kHistoryBufferSize = 320;//16;
 
 const int kLoopSlotNum = 1;
 
@@ -80,6 +80,8 @@ class RandomSequence {
     redo_write_history_ptr_ = NULL;
 
     start_ = 0;
+    currentDejaVuBufferSize = 16;
+    currentHistoryBufferSize = 16;
   }
   
   inline void Clone(const RandomSequence& source) {
@@ -149,7 +151,7 @@ class RandomSequence {
   
   inline float GetReplayValue() const {
     uint32_t h = (replay_head_ - 1 - replay_shift_ + \
-        2 * kHistoryBufferSize) % kHistoryBufferSize;
+        2 * currentHistoryBufferSize) % currentHistoryBufferSize;
     if (!replay_hash_) {
       return history_[h];
     } else {
@@ -185,7 +187,7 @@ class RandomSequence {
   
   inline float NextValue(bool deterministic, float value) {
     if (replay_head_ >= 0) {
-      replay_head_ = (replay_head_ + 1) % kHistoryBufferSize;
+      replay_head_ = (replay_head_ + 1) % currentHistoryBufferSize;
       return GetReplayValue();
     }
     
@@ -199,10 +201,10 @@ class RandomSequence {
       *redo_write_ptr_ = deterministic
           ? 1.0f + value
           : random_stream_->GetFloat();
-      loop_write_head_ = (loop_write_head_ + 1) % kDejaVuBufferSize;
+      loop_write_head_ = (loop_write_head_ + 1) % currentDejaVuBufferSize;
       step_ = start_ + length_ - 1;
-      if (step_ >= kDejaVuBufferSize) {
-        step_ -= kDejaVuBufferSize;
+      if (step_ >= currentDejaVuBufferSize) {
+        step_ -= currentDejaVuBufferSize;
       }
     } else {
       // Do not generate a new value, just replay the loop or jump randomly.
@@ -211,17 +213,17 @@ class RandomSequence {
       if (rho < p) {
         step_ = static_cast<int>(
             random_stream_->GetFloat() * static_cast<float>(length_));
-        if (step_ >= kDejaVuBufferSize) {
-          if (start_ + length_ == kDejaVuBufferSize) {
-            step_ = start_ + (step_ - kDejaVuBufferSize);
+        if (step_ >= currentDejaVuBufferSize) {
+          if (start_ + length_ == currentDejaVuBufferSize) {
+            step_ = start_ + (step_ - currentDejaVuBufferSize);
           } else {
-            step_ -= kDejaVuBufferSize;
+            step_ -= currentDejaVuBufferSize;
           }
         }
       } else {
         step_ = step_ + 1;
-        if (step_ >= kDejaVuBufferSize) {
-          if (start_ + length_ == kDejaVuBufferSize) {
+        if (step_ >= currentDejaVuBufferSize) {
+          if (start_ + length_ == currentDejaVuBufferSize) {
             step_ = start_;
           } else {
             step_ = 0;
@@ -231,8 +233,8 @@ class RandomSequence {
         }
       }
     }
-    uint32_t i = loop_write_head_ + kDejaVuBufferSize - length_ + step_;
-    redo_read_ptr_ = &loop_[i % kDejaVuBufferSize];
+    uint32_t i = loop_write_head_ + currentDejaVuBufferSize - length_ + step_;
+    redo_read_ptr_ = &loop_[i % currentDejaVuBufferSize];
     float result = *redo_read_ptr_;
     if (result >= 1.0f) {
       result -= 1.0f;
@@ -243,7 +245,7 @@ class RandomSequence {
     }
     redo_write_history_ptr_ = &history_[record_head_];
     *redo_write_history_ptr_ = result;
-    record_head_ = (record_head_ + 1) % kHistoryBufferSize;
+    record_head_ = (record_head_ + 1) % currentHistoryBufferSize;
     return result;
   }
   
@@ -283,8 +285,8 @@ class RandomSequence {
 
   inline void recalc_step() {
     int tempEndIndex = start_ + length_ - 1;
-    if (tempEndIndex >= kDejaVuBufferSize) {
-      if (step_ > (tempEndIndex - kDejaVuBufferSize)
+    if (tempEndIndex >= currentDejaVuBufferSize) {
+      if (step_ > (tempEndIndex - currentDejaVuBufferSize)
           && step_ < start_) {
         step_ = start_;
       }
@@ -338,6 +340,14 @@ class RandomSequence {
     return deja_vu_ == 0.5f;
   }
 
+  inline void set_deja_vu_buffer_size(int bufferSize) {
+    if (currentDejaVuBufferSize != bufferSize) {
+      currentDejaVuBufferSize = bufferSize;
+      currentHistoryBufferSize = bufferSize;
+      recalc_step();
+    }
+  }
+
  private:
   RandomStream* random_stream_;
   float loop_[kDejaVuBufferSize];
@@ -365,6 +375,8 @@ class RandomSequence {
   int loop_write_head_slot_[kLoopSlotNum];
   // start index (0-)
   int start_;
+  int currentDejaVuBufferSize;
+  int currentHistoryBufferSize;
 
   DISALLOW_COPY_AND_ASSIGN(RandomSequence);
 };

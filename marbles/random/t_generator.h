@@ -127,19 +127,6 @@ class TGenerator {
    */
   inline void set_start(int start) {
     sequence_.set_start(start);
-
-    if (start < 1 || start > kDejaVuBufferSize) {
-      return;
-    }
-    int start_index = start - 1;
-    // if (start_ == start_index) {
-    //   return;
-    // }
-    start_ = start_index;
-    // if (drum_pattern_step_ < (start_ - 1)
-    //   && drum_pattern_step_ > ((start_ + length_) % kDrumPatternSize)) {
-    //   drum_pattern_step_ = kDrumPatternSize - 1; // start from first at next timing
-    // }
   }
 
   inline void set_pulse_width_mean(float pulse_width_mean) {
@@ -172,6 +159,10 @@ class TGenerator {
     markov_history_ptr_ = markov_history_ptr_slot_[slot_index];
     drum_pattern_step_ = drum_pattern_step_slot_[slot_index];
     drum_pattern_index_ = drum_pattern_index_slot_[slot_index];
+  }
+
+  inline void set_deja_vu_buffer_size(int bufferSize) {
+    sequence_.set_deja_vu_buffer_size(bufferSize);
   }
 
  private:
@@ -254,8 +245,6 @@ class TGenerator {
   float drum_pattern_step_slot_[kLoopSlotNum];
   float drum_pattern_index_slot_[kLoopSlotNum];
   int length_;
-  // start index (0-)
-  int start_;
 
   DISALLOW_COPY_AND_ASSIGN(TGenerator);
 };

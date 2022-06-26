@@ -122,6 +122,12 @@ class XYGenerator {
       random_sequence_[i].load_slot(slot_index);
     }
   }
+
+  inline void set_deja_vu_buffer_size(int bufferSize) {
+    for (size_t i = 0; i < kNumChannels; ++i) {
+      random_sequence_[i].set_deja_vu_buffer_size(bufferSize);
+    }
+  }
   
  private:
   RandomSequence random_sequence_[kNumChannels];

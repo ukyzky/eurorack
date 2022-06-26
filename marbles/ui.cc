@@ -423,6 +423,11 @@ void Ui::UpdateLEDs() {
           leds_.set(LED_X_CONTROL_MODE, LED_COLOR_YELLOW);
           UpdateLEDsAlternativeValues((state.x_clock_mode & 0xF0) >> 4);
           break;
+        case ALTERNATIVE_SETTINGS_MODE_DEJA_VU_BUFFER_LENGTH:
+          leds_.set(LED_T_MODEL, LED_COLOR_YELLOW);
+          leds_.set(LED_X_CONTROL_MODE, LED_COLOR_RED);
+          UpdateLEDsAlternativeValues(state.deja_vu_buffer_length_mode);
+          break;
         default:
           break;
       }
@@ -543,6 +548,7 @@ void Ui::OnSwitchReleased(const Event& e) {
         state->quantizer_cv_mode = 0; // normal t jitter cv
         state->root_cv_mode = 0; // normal x range cv
         state->loop_cv_mode = 0; // normal t rate cv
+        state->deja_vu_buffer_length_mode = 0;
       }
       mode_ = UI_MODE_ALTERNATIVE_CONFIRMED;
       ExitAdditionalAlternateKnobMapping();
@@ -601,6 +607,21 @@ void Ui::OnSwitchReleased(const Event& e) {
             state->x_clock_mode = (3 << 4) | x_clock_mode; // T3
           } else {
             state->x_clock_mode = 0 | x_clock_mode; // T1_T2_T3
+          }
+          break;
+        case ALTERNATIVE_SETTINGS_MODE_DEJA_VU_BUFFER_LENGTH:
+          if (state->deja_vu_buffer_length_mode == 0) {
+            state->deja_vu_buffer_length_mode = 1; // 128
+          } else if (state->deja_vu_buffer_length_mode == 1) {
+            state->deja_vu_buffer_length_mode = 2; // 128 base 2
+          } else if (state->deja_vu_buffer_length_mode == 2) {
+            state->deja_vu_buffer_length_mode = 3; // 192 base 3
+          } else if (state->deja_vu_buffer_length_mode == 3) {
+            state->deja_vu_buffer_length_mode = 4; // 320 base 5
+          } else if (state->deja_vu_buffer_length_mode == 4) {
+            state->deja_vu_buffer_length_mode = 5; // 233 fibonacci
+          } else {
+            state->deja_vu_buffer_length_mode = 0;
           }
           break;
         default:

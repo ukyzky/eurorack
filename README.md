@@ -1,4 +1,4 @@
-# Marbles alternative firmware v09.2
+# Marbles alternative firmware v10
 
 This firmware adds some functions to Marbles latest v1.2+ firmware.
 
@@ -59,6 +59,12 @@ This firmware adds some functions to Marbles latest v1.2+ firmware.
 | X clock internal source in reset/hold mode | T1 | Y | Y | G | Y | 1 |
 | X clock internal source in reset/hold mode | T2 | Y | Y | G | R | 2 |
 | X clock internal source in reset/hold mode | T3 | Y | Y | Y | G | 3 |
+| deja vu loop buffer size mode | 16 (same as normal) | Y | R | G | G | 0 |
+| deja vu loop buffer size mode | 128 (Jthrw's 1,2,3,4,5,6,7,8,10,12,14,16, 24,32,48,64,96,128) | Y | R | G | Y | 1 |
+| deja vu loop buffer size mode | 128 (1,2,4,8,16,32,64,128) | Y | R | G | R | 2 |
+| deja vu loop buffer size mode | 192 (1,3,6,12,24,48,96,192) | Y | R | Y | G | 3 |
+| deja vu loop buffer size mode | 320 (1,5,10,20,40,80,160,320) | Y | R | Y | Y | 4 |
+| deja vu loop buffer size mode | 233 (1,2,3,5,8,13,21,34,55,89,144,233) | Y | R | Y | R | 5 |
 
 - Save loop sequence
 
@@ -92,8 +98,9 @@ This firmware adds some functions to Marbles latest v1.2+ firmware.
 
 ## Change log
 
-### v09.2
+### v10
 
+- Add deja vu loop buffer size mode (128, base2 up to 128, base3 up to 192, base5 up to 320, fibonacci up to 233)
 - Improve t deja vu loop pattern stability of "drum mode" on "Reset trigger in" enabled mode (GGGY).
 - Improve t deja vu loop pattern stability of "drum mode" on "Loop start pos" enabled mode (GYGY, GYGR, GYYG, GYYY).
 - Change t "drum mode" pattern immediately in t deja vu DISABLED state when "Reset trigger in" triggered on "Reset trigger in" enabled mode (GGGY).
@@ -260,6 +267,36 @@ The X spread cv input mode setting is saved to non volatile memory.
 2. Type2
 
  - X spread cv input works as X quantizer root mode Type B (not adding offset but reflect root).
+
+## deja vu loop buffer size mode
+
+We can increase deja vu loop length.
+
+The panel's marking value of LENGTH knob may differ from actual value.
+
+If deja vu loop start position setting enabled, additional step (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16) is also selectable.
+
+The deja vu loop buffer size mode setting is saved to non volatile memory.
+
+1. Type1 (Jthrw's)
+
+  - 128 (1,2,3,4,5,6,7,8,10,12,14,16,24,32,48,64,96,128)
+
+2. Type2 (base 2)
+
+  - 128 (1,2,4,8,16,32,64,128)
+
+3. Type3 (base 3)
+
+  - 192 (1,3,6,12,24,48,96,192)
+
+4. Type4 (base 5)
+
+  - 320 (1,5,10,20,40,80,160,320)
+
+5. Type5 (fibonacci)
+
+  - 233 (1,2,3,5,8,13,21,34,55,89,144,233)
 
 ## Save/Load loop sequence in volatile memory (RAM)
 

@@ -201,7 +201,16 @@ int quantizer_cv_table[] = {
   5, 5, 5
 };
 
-int loop_length[] = {
+int loop_buffer_length[] = {
+  16, // default loop_length1 max value
+  128, // loop_length2 max value
+  128, // loop_length3 max value
+  192, // loop_length4 max value
+  320, // loop_length5 max value
+  233 // loop_length6 max value
+};
+
+int loop_length1[] = {
   1,
   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
@@ -215,7 +224,7 @@ int loop_length[] = {
   14,
   16
 };
-int loop_length_cv[] = {
+int loop_length_cv1[] = {
   1,
   2,
   3,
@@ -233,6 +242,128 @@ int loop_length_cv[] = {
   15,
   16
 };
+
+int loop_length2[] = {
+  1,
+  2, 2, 2,
+  3, 3,
+  4, 4, 4, 4,
+  5, 5,
+  6, 6, 6,
+  7, 7,
+  8, 8, 8, 8, 8, 8, 8,
+  10, 10, 10,
+  12, 12, 12, 12,
+  14, 14, 14,
+  16, 16, 16, 16, 16, 16, 16,
+  24, 24, 24, 24, 24, 24,
+  32, 32, 32, 32, 32, 32, 32,
+  48, 48, 48, 48, 48, 48,
+  64, 64, 64, 64, 64, 64, 64,
+  96, 96, 96, 96, 96, 96,
+  128
+};
+int loop_length_cv2[] = {
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+  20,
+  24,
+  28,
+  32,
+  35,
+  40,
+  48,
+  56,
+  60,
+  64,
+  72,
+  80,
+  96,
+  112,
+  120,
+  128
+};
+
+int loop_length3[] = {
+  1,
+  2, 2, 2,
+  4, 4, 4,
+  8, 8, 8,
+  16, 16, 16,
+  32, 32, 32,
+  64, 64, 64,
+  128
+};
+int loop_length_cv3[] = {
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+  32,
+  64,
+  128
+};
+
+int loop_length4[] = {
+  1,
+  3, 3, 3,
+  6, 6, 6,
+  12, 12, 12,
+  24, 24, 24,
+  48, 48, 48,
+  96, 96, 96,
+  192
+};
+int loop_length_cv4[] = {
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+  24,
+  48,
+  96,
+  192
+};
+
+int loop_length5[] = {
+  1,
+  5, 5, 5,
+  10, 10, 10,
+  20, 20, 20,
+  40, 40, 40,
+  80, 80, 80,
+  160, 160, 160,
+  320
+};
+int loop_length_cv5[] = {
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+  20,
+  40,
+  80,
+  160,
+  320
+};
+
+int loop_length6[] = {
+  1,
+  2, 2, 2,
+  3, 3, 3,
+  5, 5, 5,
+  8, 8, 8,
+  13, 13, 13,
+  21, 21, 21,
+  34, 34, 34,
+  55, 55, 55,
+  89, 89, 89,
+  144, 144, 144,
+  233
+};
+int loop_length_cv6[] = {
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+  21,
+  34,
+  55,
+  89,
+  144,
+  233
+};
+
+int* loop_length = loop_length1;
+int* loop_length_cv = loop_length_cv1;
+
 float parameters[kNumParameters];
 float ramp_buffer[kBlockSize * 4];
 bool gates[kBlockSize * 2];
@@ -334,30 +465,76 @@ void Process(IOBuffer::Block* block, size_t size) {
   ramps.slave[0] = &ramp_buffer[kBlockSize * 2];
   ramps.slave[1] = &ramp_buffer[kBlockSize * 3];
   
+  int deja_vu_buffer_length_mode = state.deja_vu_buffer_length_mode;
+  int deja_vu_buffer_length = loop_buffer_length[deja_vu_buffer_length_mode];
+  int loop_length_size = 1;
+  int loop_length_cv_size = 1;
+  switch (deja_vu_buffer_length_mode)
+  {
+    case 0:
+      loop_length = loop_length1;
+      loop_length_cv = loop_length_cv1;
+      loop_length_size = sizeof(loop_length1);
+      loop_length_cv_size = sizeof(loop_length_cv1);
+      break;
+    case 1:
+      loop_length = loop_length2;
+      loop_length_cv = loop_length_cv2;
+      loop_length_size = sizeof(loop_length2);
+      loop_length_cv_size = sizeof(loop_length_cv2);
+      break;
+    case 2:
+      loop_length = loop_length3;
+      loop_length_cv = loop_length_cv3;
+      loop_length_size = sizeof(loop_length3);
+      loop_length_cv_size = sizeof(loop_length_cv3);
+      break;
+    case 3:
+      loop_length = loop_length4;
+      loop_length_cv = loop_length_cv4;
+      loop_length_size = sizeof(loop_length4);
+      loop_length_cv_size = sizeof(loop_length_cv4);
+      break;
+    case 4:
+      loop_length = loop_length5;
+      loop_length_cv = loop_length_cv5;
+      loop_length_size = sizeof(loop_length5);
+      loop_length_cv_size = sizeof(loop_length_cv5);
+      break;
+    case 5:
+      loop_length = loop_length6;
+      loop_length_cv = loop_length_cv6;
+      loop_length_size = sizeof(loop_length6);
+      loop_length_cv_size = sizeof(loop_length_cv6);
+      break;
+    default:
+      break;
+  }
+
   int deja_vu_length;
   int deja_vu_start;
   if (state.loop_cv_mode == 4) {
     // normal T rate cv input
-    // loop start position knob with fixed end position 16
+    // loop start position knob with fixed end position 16(deja_vu_buffer_length)
     deja_vu_start = deja_vu_length_quantizer.Lookup(
       loop_length_cv,
       parameters[ADC_CHANNEL_DEJA_VU_LENGTH],
-      sizeof(loop_length_cv) / sizeof(int));
-    deja_vu_length = 16 - (deja_vu_start - 1);
+      loop_length_cv_size / sizeof(int));
+    deja_vu_length = deja_vu_buffer_length - (deja_vu_start - 1);
   } else if (state.loop_cv_mode == 3) {
-    // loop start position cv with fixed end position 16
+    // loop start position cv with fixed end position 16(deja_vu_buffer_length)
     // loop start/end position offset(rotate) knob (0 to 15)
     deja_vu_start = deja_vu_length_quantizer.Lookup(
       loop_length_cv,
       cv_reader.channel(ADC_CHANNEL_T_RATE).scaled_raw_cv() / 60.0f,
-      sizeof(loop_length_cv) / sizeof(int));
-    deja_vu_length = 16 - (deja_vu_start - 1);
+      loop_length_cv_size / sizeof(int));
+    deja_vu_length = deja_vu_buffer_length - (deja_vu_start - 1);
     deja_vu_start += deja_vu_length_quantizer.Lookup(
       loop_length_cv,
       parameters[ADC_CHANNEL_DEJA_VU_LENGTH],
-      sizeof(loop_length_cv) / sizeof(int)) - 1;
-    if (deja_vu_start > 16) {
-      deja_vu_start = deja_vu_start - 16;
+      loop_length_cv_size / sizeof(int)) - 1;
+    if (deja_vu_start > deja_vu_buffer_length) {
+      deja_vu_start = deja_vu_start - deja_vu_buffer_length;
     }
   } else if (state.loop_cv_mode == 2) {
     // loop start position cv
@@ -365,32 +542,32 @@ void Process(IOBuffer::Block* block, size_t size) {
     deja_vu_length = deja_vu_length_quantizer.Lookup(
       loop_length,
       parameters[ADC_CHANNEL_DEJA_VU_LENGTH],
-      sizeof(loop_length) / sizeof(int));
+      loop_length_size / sizeof(int));
     deja_vu_start = deja_vu_length_quantizer.Lookup(
       loop_length_cv,
       cv_reader.channel(ADC_CHANNEL_T_RATE).scaled_raw_cv() / 60.0f,
-      sizeof(loop_length_cv) / sizeof(int));
+      loop_length_cv_size / sizeof(int));
   } else if (state.loop_cv_mode == 1) {
     // loop length cv
     // deja vu length knob act as deja vu start position (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16) knob
     deja_vu_length = deja_vu_length_quantizer.Lookup(
       loop_length_cv,
       cv_reader.channel(ADC_CHANNEL_T_RATE).scaled_raw_cv() / 60.0f,
-      sizeof(loop_length_cv) / sizeof(int));
+      loop_length_cv_size / sizeof(int));
     deja_vu_start = deja_vu_length_quantizer.Lookup(
       loop_length_cv,
       parameters[ADC_CHANNEL_DEJA_VU_LENGTH],
-      sizeof(loop_length_cv) / sizeof(int));
+      loop_length_cv_size / sizeof(int));
   } else {
     // normal t rate cv
     deja_vu_length = deja_vu_length_quantizer.Lookup(
       loop_length,
       parameters[ADC_CHANNEL_DEJA_VU_LENGTH],
-      sizeof(loop_length) / sizeof(int));
+      loop_length_size / sizeof(int));
     deja_vu_start = deja_vu_length_quantizer.Lookup(
       loop_length,
       state.loop_start / 255.f,
-      sizeof(loop_length) / sizeof(int));
+      loop_length_size / sizeof(int));
   }
 
   t_generator.set_model(TGeneratorModel(state.t_model));
@@ -410,6 +587,7 @@ void Process(IOBuffer::Block* block, size_t size) {
       state.t_deja_vu == DEJA_VU_LOCKED
           ? 0.5f
           : (state.t_deja_vu == DEJA_VU_ON ? deja_vu : 0.0f));
+  t_generator.set_deja_vu_buffer_size(deja_vu_buffer_length);
   t_generator.set_length(deja_vu_length);
   t_generator.set_start(deja_vu_start);
   t_generator.set_pulse_width_mean(float(state.t_pulse_width_mean) / 256.0f);
@@ -516,6 +694,7 @@ void Process(IOBuffer::Block* block, size_t size) {
       y.scale_index = x.scale_index = scale_index;
     }
 
+    xy_generator.set_deja_vu_buffer_size(deja_vu_buffer_length);
     xy_generator.Process(
         xy_clock_source,
         x,
