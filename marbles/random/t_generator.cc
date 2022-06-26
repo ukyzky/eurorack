@@ -162,6 +162,17 @@ void TGenerator::Init(RandomStream* random_stream, float sr) {
   rate_quantizer_.Init();
   
   use_external_clock_ = false;
+
+  for (int i = 0; i < kLoopSlotNum; ++i) {
+    std::fill(&streak_counter_slot_[i][0], &streak_counter_slot_[i][kMarkovHistorySize], 0);
+    std::fill(&markov_history_slot_[i][0], &markov_history_slot_[i][kMarkovHistorySize], 0);
+    markov_history_ptr_slot_[i] = 0;
+    drum_pattern_step_slot_[i] = 0;
+    drum_pattern_index_slot_[i] = 0;
+  }
+
+  length_ = 0;
+  start_ = 0;
 }
 
 int TGenerator::GenerateComplementaryBernoulli(const RandomVector& x) {
@@ -199,6 +210,7 @@ int TGenerator::GenerateThreeStates(const RandomVector& x) {
 }
 
 int TGenerator::GenerateDrums(const RandomVector& x) {
+  if (!sequence_.deja_vu_ing()) {
   ++drum_pattern_step_;
   if (drum_pattern_step_ >= kDrumPatternSize) {
     drum_pattern_step_ = 0;
@@ -206,6 +218,16 @@ int TGenerator::GenerateDrums(const RandomVector& x) {
     drum_pattern_index_ = static_cast<int32_t>(kNumDrumPatterns * u);
     if (bias_ <= 0.5f) {
       drum_pattern_index_ -= drum_pattern_index_ % 2;
+    }
+  }
+  } else {
+    drum_pattern_step_ = sequence_.step() % kDrumPatternSize;
+    if (drum_pattern_step_ == 0) {
+      float u = x.variables.u[0] * 2.0f * fabs(bias_ - 0.5f);
+      drum_pattern_index_ = static_cast<int32_t>(kNumDrumPatterns * u);
+      if (bias_ <= 0.5f) {
+        drum_pattern_index_ -= drum_pattern_index_ % 2;
+      }
     }
   }
   return drum_patterns[drum_pattern_index_][drum_pattern_step_];
@@ -352,7 +374,9 @@ void TGenerator::Process(
         ratio, true, external_clock, ramps.external, size);
     if (reset_observed) {
       if (model_ == T_GENERATOR_MODEL_DRUMS) {
+        if (!sequence_.deja_vu_ing()) {
         drum_pattern_step_ = kDrumPatternSize;
+        }
         RandomVector random_vector;
         sequence_.NextVector(
             random_vector.x,
@@ -382,6 +406,9 @@ void TGenerator::Process(
       flags = *external_reset++;
       if (flags == GATE_FLAG_RISING || flags == GATE_FLAG_HIGH) {
         if (!external_hold) {
+          if (!sequence_.deja_vu_ing()) {
+            drum_pattern_step_ = kDrumPatternSize - 1; // start from first at next timing
+          }
           sequence_.reset_step();
         } else {
           gate_holding_ = true;

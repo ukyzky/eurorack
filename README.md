@@ -1,4 +1,4 @@
-# Marbles alternative firmware v09.1
+# Marbles alternative firmware v09.2
 
 This firmware adds some functions to Marbles latest v1.2+ firmware.
 
@@ -91,6 +91,12 @@ This firmware adds some functions to Marbles latest v1.2+ firmware.
   - hold t mode button **[E]** and press T rate button **[B]**
 
 ## Change log
+
+### v09.2
+
+- Improve t deja vu loop pattern stability of "drum mode" on "Reset trigger in" enabled mode (GGGY).
+- Improve t deja vu loop pattern stability of "drum mode" on "Loop start pos" enabled mode (GYGY, GYGR, GYYG, GYYY).
+- Change t "drum mode" pattern immediately in t deja vu DISABLED state when "Reset trigger in" triggered on "Reset trigger in" enabled mode (GGGY).
 
 ### v09.1
 

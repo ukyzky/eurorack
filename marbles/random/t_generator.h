@@ -121,8 +121,25 @@ class TGenerator {
     sequence_.set_length(length);
   }
 
+  /**
+   * set start
+   * @param start start number (1-)
+   */
   inline void set_start(int start) {
     sequence_.set_start(start);
+
+    if (start < 1 || start > kDejaVuBufferSize) {
+      return;
+    }
+    int start_index = start - 1;
+    // if (start_ == start_index) {
+    //   return;
+    // }
+    start_ = start_index;
+    // if (drum_pattern_step_ < (start_ - 1)
+    //   && drum_pattern_step_ > ((start_ + length_) % kDrumPatternSize)) {
+    //   drum_pattern_step_ = kDrumPatternSize - 1; // start from first at next timing
+    // }
   }
 
   inline void set_pulse_width_mean(float pulse_width_mean) {
@@ -135,10 +152,26 @@ class TGenerator {
 
   inline void save_slot(int slot_index) {
     sequence_.save_slot(slot_index);
+
+    for (size_t i = 0; i < kMarkovHistorySize; ++i) {
+      streak_counter_slot_[slot_index][i] = streak_counter_[i];
+      markov_history_slot_[slot_index][i] = markov_history_[i];
+    }
+    markov_history_ptr_slot_[slot_index] = markov_history_ptr_;
+    drum_pattern_step_slot_[slot_index] = drum_pattern_step_;
+    drum_pattern_index_slot_[slot_index] = drum_pattern_index_;
   }
 
   inline void load_slot(int slot_index) {
     sequence_.load_slot(slot_index);
+
+    for (size_t i = 0; i < kMarkovHistorySize; ++i) {
+      streak_counter_[i] = streak_counter_slot_[slot_index][i];
+      markov_history_[i] = markov_history_slot_[slot_index][i];
+    }
+    markov_history_ptr_ = markov_history_ptr_slot_[slot_index];
+    drum_pattern_step_ = drum_pattern_step_slot_[slot_index];
+    drum_pattern_index_ = drum_pattern_index_slot_[slot_index];
   }
 
  private:
@@ -215,6 +248,15 @@ class TGenerator {
   static Ratio input_divider_ratios[kNumInputDividerRatios];
   static uint8_t drum_patterns[kNumDrumPatterns][kDrumPatternSize];
   
+  int32_t streak_counter_slot_[kLoopSlotNum][kMarkovHistorySize];
+  int32_t markov_history_slot_[kLoopSlotNum][kMarkovHistorySize];
+  int32_t markov_history_ptr_slot_[kLoopSlotNum];
+  float drum_pattern_step_slot_[kLoopSlotNum];
+  float drum_pattern_index_slot_[kLoopSlotNum];
+  int length_;
+  // start index (0-)
+  int start_;
+
   DISALLOW_COPY_AND_ASSIGN(TGenerator);
 };
 

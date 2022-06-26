@@ -268,6 +268,10 @@ class RandomSequence {
     recalc_step();
   }
 
+  /**
+   * set start
+   * @param start start number (1-)
+   */
   inline void set_start(int start) {
     if (start < 1 || start > kDejaVuBufferSize) {
       return;
@@ -326,6 +330,14 @@ class RandomSequence {
     // next process() call, step_ will be resetted to start position.
   }
 
+  inline int step() {
+    return step_;
+  }
+
+  inline bool deja_vu_ing() {
+    return deja_vu_ == 0.5f;
+  }
+
  private:
   RandomStream* random_stream_;
   float loop_[kDejaVuBufferSize];
@@ -351,6 +363,7 @@ class RandomSequence {
   float loop_slot_[kLoopSlotNum][kDejaVuBufferSize];
   float history_slot_[kLoopSlotNum][kHistoryBufferSize];
   int loop_write_head_slot_[kLoopSlotNum];
+  // start index (0-)
   int start_;
 
   DISALLOW_COPY_AND_ASSIGN(RandomSequence);
