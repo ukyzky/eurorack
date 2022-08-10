@@ -72,6 +72,11 @@ void OutputChannel::Init() {
   }
 
   root_mode_ = 0;
+  chord_mode_ = 0;
+  slew_rate_ = 0.0f;
+  same_note_probability_ = 0.0f;
+  same_note_ = 0;
+  quantized_ = false;
 }
 
 float OutputChannel::GenerateNewVoltage(RandomSequence* random_sequence) {
@@ -102,7 +107,9 @@ void OutputChannel::Process(
     size_t size,
     size_t stride,
     const stmlib::GateFlags* external_reset,
-    bool external_hold) {
+    bool external_hold,
+    float* used_voltages,
+    int num_used_voltages) {
   
   ParameterInterpolator steps_modulation(
       &previous_steps_, steps_, size);
@@ -158,7 +165,15 @@ void OutputChannel::Process(
     if (!gate_holding_) {
     if (*phase < previous_phase_) {
       previous_voltage_ = voltage_;
+      if (chord_mode_) {
+        if (same_note_ != 0) {
+          // use the same voltage_
+        } else {
+          voltage_ = GenerateNewVoltage(random_sequence);
+        }
+      } else {
       voltage_ = GenerateNewVoltage(random_sequence);
+      }
       lag_processor_.ResetRamp();
       if (root_mode_ == 1) {
         quantized_voltage_ = QuantizeEx(voltage_, 2.0f * steps - 1.0f, register_value_);
@@ -173,11 +188,18 @@ void OutputChannel::Process(
     }
     }
     
+    if (chord_mode_ == 4 || chord_mode_ == 5) {
+      const float smoothness = slew_rate_;
+      *output = lag_processor_.Process(quantized_voltage_, smoothness, *phase);
+    } else if (chord_mode_ != 0) { // 1 or 2 or 3
+      *output = quantized_voltage_;
+    } else {
     if (steps >= 0.5f) {
       *output = quantized_voltage_;
     } else {
       const float smoothness = 1.0f - 2.0f * steps;
       *output = lag_processor_.Process(voltage_, smoothness, *phase);
+    }
     }
     // before_reset_voltage_ = *output;
     output += stride;
@@ -185,16 +207,28 @@ void OutputChannel::Process(
   }
 }
 
-float OutputChannel::QuantizeEx(float voltage, float amount, float root) {
-  float voltageProcess = quantizer_[scale_index_].Process(voltage, amount, false);
+float OutputChannel::QuantizeEx(float voltage, float amount, float root, float* used_voltages, int num_used_voltages) {
+  quantized_ = true;
+  float voltageProcess = 0.0f;
+  if (used_voltages) {
+    voltageProcess = quantizer_[scale_index_].ProcessEx(voltage, amount, false, used_voltages, num_used_voltages);
+  } else {
+    voltageProcess = quantizer_[scale_index_].Process(voltage, amount, false);
+  }
   return voltageProcess + root * 10.0f - 5.0f;
 }
 
-float OutputChannel::QuantizeEx2(float voltage, float amount, float root) {
+float OutputChannel::QuantizeEx2(float voltage, float amount, float root, float* used_voltages, int num_used_voltages) {
+  quantized_ = true;
   float newRoot = root * 10.0f - 5.0f;
   int voltageInt = floor(newRoot);
   float voltageOffset = newRoot - voltageInt;
-  float voltageProcess = quantizer_[scale_index_].Process(voltage - voltageOffset, amount, false);
+  float voltageProcess = 0.0f;
+  if (used_voltages) {
+    voltageProcess = quantizer_[scale_index_].ProcessEx(voltage - voltageOffset, amount, false, used_voltages, num_used_voltages);
+  } else {
+    voltageProcess = quantizer_[scale_index_].Process(voltage - voltageOffset, amount, false);
+  }
   return voltageProcess + voltageOffset;
 }
 

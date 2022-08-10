@@ -1,4 +1,4 @@
-# Marbles alternative firmware v10
+# Marbles alternative firmware v11
 
 This firmware adds some functions to Marbles latest v1.2+ firmware.
 
@@ -8,6 +8,8 @@ This firmware adds some functions to Marbles latest v1.2+ firmware.
 - T rate cv input can work as deja vu loop length or start position select (four alternative modes).
 - T jitter cv input can work as X quantizer scale slot select.
 - X spread cv input can work as X quantizer root select (two alternative modes).
+- chord mode (five alternative modes). x always quantized with new steps mapping. x generates different note as possible. controlling x same note probability. controlling x slew amount.
+- deja vu loop buffer size (five alternative modes).
 - save/load loop sequence in volatile memory (RAM).
 
 ## additional function in normal mode
@@ -65,6 +67,12 @@ This firmware adds some functions to Marbles latest v1.2+ firmware.
 | deja vu loop buffer size mode | 192 (1,3,6,12,24,48,96,192) | Y | R | Y | G | 3 |
 | deja vu loop buffer size mode | 320 (1,5,10,20,40,80,160,320) | Y | R | Y | Y | 4 |
 | deja vu loop buffer size mode | 233 (1,2,3,5,8,13,21,34,55,89,144,233) | Y | R | Y | R | 5 |
+| chord mode | (same as normal) | R | G | G | G | 0 |
+| chord mode | x always quantized and generated different note as possible. | R | G | G | Y | 1 |
+| chord mode (x steps cv in) | x always quantized and generated different note as possible. (x same note probability cv in) | R | G | G | R | 2 |
+| chord mode (x bias cv in) | x always quantized and generated different note as possible. (x same note probability cv in) | R | G | Y | G | 3 |
+| chord mode (x bias cv in / x steps cv in) | x always quantized and generated different note as possible. (x same note probability cv in / x slew amount cv in) | R | G | Y | Y | 4 |
+| chord mode (x bias knob / x steps knob) | x always quantized and generated different note as possible. (x same note probability knob / x slew amount knob) | R | G | Y | R | 5 |
 
 - Save loop sequence
 
@@ -97,6 +105,10 @@ This firmware adds some functions to Marbles latest v1.2+ firmware.
   - hold t mode button **[E]** and press T rate button **[B]**
 
 ## Change log
+
+### v11
+
+- Add chode mode (five alternative modes). x always quantized with new x steps mapping (7 o'clock: only rare notes. 12 o'clock: all notes. 5 o'clock: only general notes.). x generates different notes as possible. controlling x same note probability. controlling x slew amount.
 
 ### v10
 
@@ -267,6 +279,29 @@ The X spread cv input mode setting is saved to non volatile memory.
 2. Type2
 
  - X spread cv input works as X quantizer root mode Type B (not adding offset but reflect root).
+
+## chord mode
+
+- Type1,2,3,4,5:
+
+x always quantized with new x steps mapping (7 o'clock: only rare notes. 12 o'clock: all notes. 5 o'clock: only general notes.).
+
+x generates different note from the others x. (Limitation: If variation of notes is a few amount, the same note may be generated.)
+
+- Type2,3,4,5:
+
+Controlling x same note probability. (0V: different note a.k.a. normal behavior. 2.5V: 50% the same note. 5V: always the same note.)
+
+- Type4,5:
+
+Controlling x slew amount. (0V: no slew. 5V: large slew amount.)
+
+- notes:
+
+Type2,3,4,5 replace some cv in or knob to alternative setting (x same note probability or x slew amount).
+When the knob is replaced, the cv in works as original function (x steps or x bias).
+When the cv in is replaced, the knob works as original function (x steps or x bias).
+
 
 ## deja vu loop buffer size mode
 

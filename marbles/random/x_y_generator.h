@@ -83,6 +83,9 @@ struct GroupSettings {
   Ratio ratio;
   int start;
   int root_mode;
+  int chord_mode;
+  float slew; // for chord_mode
+  float same_note_probability; // for chord_mode
 };
 
 class XYGenerator {
@@ -130,6 +133,7 @@ class XYGenerator {
   }
   
  private:
+  RandomStream* random_stream_;
   RandomSequence random_sequence_[kNumChannels];
   OutputChannel output_channel_[kNumChannels];
   RampExtractor ramp_extractor_;
@@ -138,6 +142,8 @@ class XYGenerator {
   int external_clock_stabilization_counter_;
   
   bool use_shifted_sequences_[kNumChannels];
+
+  float used_voltages_[kNumChannels]; // for chord_mode
   
   DISALLOW_COPY_AND_ASSIGN(XYGenerator);
 };

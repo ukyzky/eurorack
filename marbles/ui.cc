@@ -428,6 +428,11 @@ void Ui::UpdateLEDs() {
           leds_.set(LED_X_CONTROL_MODE, LED_COLOR_RED);
           UpdateLEDsAlternativeValues(state.deja_vu_buffer_length_mode);
           break;
+        case ALTERNATIVE_SETTINGS_MODE_CHORD:
+          leds_.set(LED_T_MODEL, LED_COLOR_RED);
+          leds_.set(LED_X_CONTROL_MODE, LED_COLOR_GREEN);
+          UpdateLEDsAlternativeValues(state.chord_mode);
+          break;
         default:
           break;
       }
@@ -549,6 +554,7 @@ void Ui::OnSwitchReleased(const Event& e) {
         state->root_cv_mode = 0; // normal x range cv
         state->loop_cv_mode = 0; // normal t rate cv
         state->deja_vu_buffer_length_mode = 0;
+        state->chord_mode = 0;
       }
       mode_ = UI_MODE_ALTERNATIVE_CONFIRMED;
       ExitAdditionalAlternateKnobMapping();
@@ -622,6 +628,21 @@ void Ui::OnSwitchReleased(const Event& e) {
             state->deja_vu_buffer_length_mode = 5; // 233 fibonacci
           } else {
             state->deja_vu_buffer_length_mode = 0;
+          }
+          break;
+        case ALTERNATIVE_SETTINGS_MODE_CHORD:
+          if (state->chord_mode == 0) {
+            state->chord_mode = 1; // chord
+          } else if (state->chord_mode == 1) {
+            state->chord_mode = 2; // chord
+          } else if (state->chord_mode == 2) {
+            state->chord_mode = 3; // chord
+          } else if (state->chord_mode == 3) {
+            state->chord_mode = 4; // chord
+          } else if (state->chord_mode == 4) {
+            state->chord_mode = 5; // chord
+          } else {
+            state->chord_mode = 0;
           }
           break;
         default:

@@ -38,6 +38,7 @@ using namespace std;
 using namespace stmlib;
 
 void XYGenerator::Init(RandomStream* random_stream, float sr) {
+  random_stream_ = random_stream;
   for (size_t i = 0; i < kNumChannels; ++i) {
     random_sequence_[i].Init(random_stream);
     output_channel_[i].Init();
@@ -122,11 +123,28 @@ void XYGenerator::Process(
   
   ramp_divider_.Process(y_settings.ratio, channel_ramp[1], ramps.external, size);
   channel_ramp[kNumChannels - 1] = ramps.external;
+
+  for (size_t i = 0; i < kNumChannels; ++i) {
+    OutputChannel& channel = output_channel_[i];
+    used_voltages_[i] = channel.get_quantized_voltage();
+  }
   
+  int same_note = 0;
+  if (x_settings.chord_mode && x_settings.same_note_probability > 0.0f) {
+    if (random_stream_->GetFloat() <= x_settings.same_note_probability) {
+      same_note = 1;
+    }
+  }
+
   for (size_t i = 0; i < kNumChannels; ++i) {
     OutputChannel& channel = output_channel_[i];
     const GroupSettings& settings = i < kNumXChannels ? x_settings : y_settings;
-    
+
+    used_voltages_[i] = -99.0f; // clear own channel used voltage value
+    if (i > 0) {
+      used_voltages_[i - 1] = output_channel_[i - 1].get_quantized_voltage(); // get voltage generated in the current loop
+    }
+
     switch (settings.voltage_range) {
       case VOLTAGE_RANGE_NARROW:
         channel.set_scale_offset(ScaleOffset(2.0f, 0.0f));
@@ -153,6 +171,8 @@ void XYGenerator::Process(
     
     channel.set_spread(0.5f + (settings.spread - 0.5f) * amount);
     channel.set_bias(0.5f + (settings.bias - 0.5f) * amount);
+    // if (settings.chord_mode == 2) { // use x steps for x and y
+    //   channel.set_steps(0.5f + (x_settings.steps - 0.5f) * (settings.register_mode ? 1.0f : amount));
     channel.set_steps(0.5f + (settings.steps - 0.5f) * \
         (settings.register_mode ? 1.0f : amount));
     channel.set_scale_index(settings.scale_index);
@@ -161,6 +181,12 @@ void XYGenerator::Process(
     channel.set_root_mode(settings.root_mode);
     channel.set_register_transposition(
         4.0f * settings.spread * (settings.bias - 0.5f) * amount);
+    channel.set_chord_mode(settings.chord_mode);
+    // if (settings.chord_mode == 2) { // use y steps as slew rate for x and y
+    //   channel.set_slew_rate(y_settings.steps);
+    channel.set_slew_rate(settings.slew);
+    channel.set_same_note_probability(settings.same_note_probability);
+    channel.set_same_note(settings.chord_mode ? same_note : 0);
     
     RandomSequence* sequence = &random_sequence_[i];
     sequence->Record();
@@ -195,7 +221,13 @@ void XYGenerator::Process(
     }
     use_shifted_sequences_[i] = use_shifted_sequences;
     
+    if (settings.chord_mode != 0) {
+      channel.Process(sequence, channel_ramp[i], &output[i], size, kNumChannels, external_reset, external_hold, used_voltages_, kNumXChannels);
+    // } else if (settings.chord_mode == 2) {
+    //   channel.Process(sequence, channel_ramp[i], &output[i], size, kNumChannels, external_reset, external_hold, used_voltages_, kNumChannels);
+    } else {
     channel.Process(sequence, channel_ramp[i], &output[i], size, kNumChannels, external_reset, external_hold);
+    }
   }
 }
 

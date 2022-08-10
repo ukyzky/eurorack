@@ -106,8 +106,16 @@ struct State {
   // 4: 320 (only 5 x2)
   // 5: 233 (only fibonacci)
   uint8_t deja_vu_buffer_length_mode;
+  // chord mode
+  // 0: normal
+  // 1: different note. all steps quantize(left: only rare, mid: all, right: only common)
+  // 2: different note. all steps quantize(left: only rare, mid: all, right: only common). use x steps cv for x same note probability.
+  // 3: different note. all steps quantize(left: only rare, mid: all, right: only common). use x bias cv for x same note probability.
+  // 4: different note. all steps quantize(left: only rare, mid: all, right: only common). use x bias cv for x same note probability. use x steps cv for x slew.
+  // 5: different note. all steps quantize(left: only rare, mid: all, right: only common). use x bias knob for x same note probability. use x steps knob for x slew.
+  uint8_t chord_mode;
 
-  uint8_t padding[2];
+  uint8_t padding[1];
 
   enum { tag = 0x54415453 };
 };

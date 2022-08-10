@@ -70,10 +70,12 @@ class OutputChannel {
       size_t size,
       size_t stride,
       const stmlib::GateFlags* external_reset,
-      bool external_hold);
+      bool external_hold,
+      float* used_voltages = NULL,
+      int num_used_voltages = 0);
 
-  float QuantizeEx(float voltage, float amount, float root);
-  float QuantizeEx2(float voltage, float amount, float root);
+  float QuantizeEx(float voltage, float amount, float root, float* used_voltages = NULL, int num_used_voltages = 0);
+  float QuantizeEx2(float voltage, float amount, float root, float* used_voltages = NULL, int num_used_voltages = 0);
 
   inline void set_spread(float spread) {
     spread_ = spread;
@@ -107,12 +109,36 @@ class OutputChannel {
     scale_offset_ = scale_offset;
   }
   
-  inline float Quantize(float voltage, float amount) {
+  inline float Quantize(float voltage, float amount, float* used_voltages = NULL, int num_used_voltages = 0) {
+    quantized_ = true;
+    if (used_voltages) {
+      return quantizer_[scale_index_].ProcessEx(voltage, amount, false, used_voltages, num_used_voltages);
+    }
     return quantizer_[scale_index_].Process(voltage, amount, false);
   }
   
   inline void set_root_mode(int root_mode) {
     root_mode_ = root_mode;
+  }
+
+  inline void set_chord_mode(int chord_mode) {
+    chord_mode_ = chord_mode;
+  }
+
+  inline void set_slew_rate(float slew_rate) {
+    slew_rate_ = slew_rate;
+  }
+
+  inline void set_same_note_probability(float probability) {
+    same_note_probability_ = probability;
+  }
+
+  inline void set_same_note(int same_note) {
+    same_note_ = same_note;
+  }
+
+  inline float get_quantized_voltage() {
+    return quantized_ ? quantized_voltage_ : -99.0f; // magic number for never hit as used
   }
 
  private:
@@ -145,6 +171,12 @@ class OutputChannel {
   Quantizer quantizer_[6];
 
   int root_mode_;
+
+  int chord_mode_;
+  float slew_rate_; // for chord_mode_
+  float same_note_probability_; // for chord_mode_
+  int same_note_; // for chord_mode_
+  bool quantized_; // for chord_mode_
   
   DISALLOW_COPY_AND_ASSIGN(OutputChannel);
 };

@@ -641,6 +641,7 @@ void Process(IOBuffer::Block* block, size_t size) {
     }
     fill(&voltages[0], &voltages[4 * size], voltage);
   } else {
+    x.chord_mode = state.x_register_mode ? 0 : state.chord_mode;
     x.control_mode = ControlMode(state.x_control_mode);
     x.voltage_range = VoltageRange(state.x_range % 3);
     x.register_mode = state.x_register_mode;
@@ -654,8 +655,32 @@ void Process(IOBuffer::Block* block, size_t size) {
     } else {
       x.spread = cv_reader.channel(ADC_CHANNEL_X_SPREAD).pot();
     }
+    if (x.chord_mode == 2) {
+      x.bias = parameters[ADC_CHANNEL_X_BIAS];
+      x.steps = cv_reader.channel(ADC_CHANNEL_X_STEPS).pot();
+      x.same_note_probability = cv_reader.channel(ADC_CHANNEL_X_STEPS).cv();
+      x.slew = 0.0f;
+    } else if (x.chord_mode == 3) {
+      x.bias = cv_reader.channel(ADC_CHANNEL_X_BIAS).pot();
+      x.steps = parameters[ADC_CHANNEL_X_STEPS];
+      x.same_note_probability = cv_reader.channel(ADC_CHANNEL_X_BIAS).cv();
+      x.slew = 0.0f;
+    } else if (x.chord_mode == 4) {
+      x.bias = cv_reader.channel(ADC_CHANNEL_X_BIAS).pot();
+      x.steps = cv_reader.channel(ADC_CHANNEL_X_STEPS).pot();
+      x.same_note_probability = cv_reader.channel(ADC_CHANNEL_X_BIAS).cv();
+      x.slew = cv_reader.channel(ADC_CHANNEL_X_STEPS).cv();
+    } else if (x.chord_mode == 5) {
+      x.bias = cv_reader.channel(ADC_CHANNEL_X_BIAS).cv();
+      x.steps = cv_reader.channel(ADC_CHANNEL_X_STEPS).cv();
+      x.same_note_probability = cv_reader.channel(ADC_CHANNEL_X_BIAS).pot();
+      x.slew = cv_reader.channel(ADC_CHANNEL_X_STEPS).pot();
+    } else { // x.chord_mode == 0 or 1
     x.bias = parameters[ADC_CHANNEL_X_BIAS];
     x.steps = parameters[ADC_CHANNEL_X_STEPS];
+      x.same_note_probability = 0.0f;
+      x.slew = 0.0f;
+    }
     x.deja_vu = state.x_deja_vu == DEJA_VU_LOCKED
         ? 0.5f
         : (state.x_deja_vu == DEJA_VU_ON ? deja_vu : 0.0f);
@@ -664,6 +689,7 @@ void Process(IOBuffer::Block* block, size_t size) {
     x.ratio.p = 1;
     x.ratio.q = 1;
   
+    y.chord_mode = 0; // state.chord_mode;
     y.control_mode = CONTROL_MODE_IDENTICAL;
     y.voltage_range = VoltageRange(state.y_range);
     y.register_mode = false;
@@ -671,7 +697,13 @@ void Process(IOBuffer::Block* block, size_t size) {
     y.register_value = 0.0f;
     y.spread = float(state.y_spread) / 256.0f;
     y.bias = float(state.y_bias) / 256.0f;
+    // if (y.chord_mode) {
+    //   y.steps = x.steps;
+    // } else {
     y.steps = float(state.y_steps) / 256.0f;
+    // }
+    y.slew = 0.0f;
+    y.same_note_probability = 0.0f;
     y.deja_vu = 0.0f;
     y.length = 1;
     y.start = 1;

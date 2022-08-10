@@ -39,6 +39,7 @@ namespace marbles {
 
 const int kMaxDegrees = 16;
 const int kNumThresholds = 7;
+const int kNumThresholdsChord = 14;
 
 struct Degree {
   float voltage;
@@ -97,6 +98,7 @@ class Quantizer {
   void Init(const Scale& scale);
 
   float Process(float value, float amount, bool hysteresis);
+  float ProcessEx(float value, float amount, bool hysteresis, float* used_voltages, int num_used_voltages);
   
  private:
   struct Level {
@@ -113,7 +115,10 @@ class Quantizer {
   float base_interval_reciprocal_;
   int num_degrees_;
   stmlib::HysteresisQuantizer level_quantizer_;
-  
+
+  Level levelChord_[kNumThresholdsChord];
+  float feedbackChord_[kNumThresholdsChord];
+
   DISALLOW_COPY_AND_ASSIGN(Quantizer);
 };
 
