@@ -130,11 +130,11 @@ void OutputChannel::Process(
     float u = random_sequence->RewriteValue(register_value_);
     voltage_ = 10.0f * (u - 0.5f) + register_transposition_;
     if (root_mode_ == 1) {
-      quantized_voltage_ = QuantizeEx(voltage_, 2.0f * steps_ - 1.0f, register_value_);
+      quantized_voltage_ = QuantizeEx(voltage_, 2.0f * steps_ - 1.0f, register_value_, used_voltages, num_used_voltages);
     } else if (root_mode_ == 2) {
-      quantized_voltage_ = QuantizeEx2(voltage_, 2.0f * steps_ - 1.0f, register_value_);
+      quantized_voltage_ = QuantizeEx2(voltage_, 2.0f * steps_ - 1.0f, register_value_, used_voltages, num_used_voltages);
     } else {
-    quantized_voltage_ = Quantize(voltage_, 2.0f * steps_ - 1.0f);
+    quantized_voltage_ = Quantize(voltage_, 2.0f * steps_ - 1.0f, used_voltages, num_used_voltages);
     }
   }
   
@@ -176,11 +176,11 @@ void OutputChannel::Process(
       }
       lag_processor_.ResetRamp();
       if (root_mode_ == 1) {
-        quantized_voltage_ = QuantizeEx(voltage_, 2.0f * steps - 1.0f, register_value_);
+        quantized_voltage_ = QuantizeEx(voltage_, 2.0f * steps - 1.0f, register_value_, used_voltages, num_used_voltages);
       } else if (root_mode_ == 2) {
-        quantized_voltage_ = QuantizeEx2(voltage_, 2.0f * steps - 1.0f, register_value_);
+        quantized_voltage_ = QuantizeEx2(voltage_, 2.0f * steps - 1.0f, register_value_, used_voltages, num_used_voltages);
       } else {
-      quantized_voltage_ = Quantize(voltage_, 2.0f * steps - 1.0f);
+      quantized_voltage_ = Quantize(voltage_, 2.0f * steps - 1.0f, used_voltages, num_used_voltages);
       }
       if (register_mode_) {
         reacquisition_counter_ = kNumReacquisitions;

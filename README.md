@@ -1,4 +1,4 @@
-# Marbles alternative firmware v11
+# Marbles alternative firmware v11.1
 
 This firmware adds some functions to Marbles latest v1.2+ firmware.
 
@@ -106,9 +106,17 @@ This firmware adds some functions to Marbles latest v1.2+ firmware.
 
 ## Change log
 
+### v11.1
+
+- Fix chord mode (x always quantized with new x steps mapping. x generates different notes as possible.)
+
 ### v11
 
-- Add chord mode (five alternative modes). x always quantized with new x steps mapping (7 o'clock: only rare notes. 12 o'clock: all notes. 5 o'clock: only general notes.). x generates different notes as possible. controlling x same note probability. controlling x slew amount.
+- Add chord mode (five alternative modes).
+  - x always quantized with new x steps mapping (7 o'clock: only rare notes. 12 o'clock: all notes. 5 o'clock: only general notes.).
+  - x generates different notes as possible.
+  - controlling x same note probability.
+  - controlling x slew amount.
 
 ### v10
 
