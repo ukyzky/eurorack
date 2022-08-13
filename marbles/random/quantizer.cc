@@ -82,8 +82,13 @@ void Quantizer::Init(const Scale& scale) {
     thresholdsChord_[kNumThresholds - 2] = second_largest_threshold;
   }
 
-  if (second_smallest_threshold < 16) {
-    thresholdsChord_[1] = second_smallest_threshold;
+  for (int i = 1; i < kNumThresholds - 2; i++) { // 16, 32, 64, 128, 192
+    if (smallest_threshold > thresholdsChord_[i]) {
+      thresholdsChord_[i] = smallest_threshold;
+    }
+    if (second_smallest_threshold > thresholdsChord_[i]) {
+      thresholdsChord_[i] = second_smallest_threshold;
+    }
   }
 
   Level level_inv[kNumThresholds];  

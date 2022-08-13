@@ -1,4 +1,4 @@
-# Marbles alternative firmware v11.2
+# Marbles alternative firmware v11.3
 
 This firmware adds some functions to Marbles latest v1.2+ firmware.
 
@@ -105,6 +105,10 @@ This firmware adds some functions to Marbles latest v1.2+ firmware.
   - hold t mode button **[E]** and press T rate button **[B]**
 
 ## Change log
+
+### v11.3
+
+- Fix chord mode (x always quantized with new x steps mapping.)
 
 ### v11.2
 
