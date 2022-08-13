@@ -1,4 +1,4 @@
-# Marbles alternative firmware v11.1
+# Marbles alternative firmware v11.2
 
 This firmware adds some functions to Marbles latest v1.2+ firmware.
 
@@ -105,6 +105,10 @@ This firmware adds some functions to Marbles latest v1.2+ firmware.
   - hold t mode button **[E]** and press T rate button **[B]**
 
 ## Change log
+
+### v11.2
+
+- Fix chord mode (x always quantized with new x steps mapping.)
 
 ### v11.1
 
@@ -292,7 +296,7 @@ The X spread cv input mode setting is saved to non volatile memory.
 
 - Type1,2,3,4,5:
 
-x always quantized with new x steps mapping (7 o'clock: only rare notes. 12 o'clock: all notes. 5 o'clock: only general notes.).
+x always quantized with new x steps mapping (CCW 7 o'clock: only rare notes. 12 o'clock: all notes. CW 5 o'clock: only general notes.).
 
 x generates different note from the others x. (Limitation: If variation of notes is a few amount, the same note may be generated.)
 

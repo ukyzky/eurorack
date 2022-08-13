@@ -226,7 +226,7 @@ void XYGenerator::Process(
     // } else if (settings.chord_mode == 2) {
     //   channel.Process(sequence, channel_ramp[i], &output[i], size, kNumChannels, external_reset, external_hold, used_voltages_, kNumChannels);
     } else {
-    channel.Process(sequence, channel_ramp[i], &output[i], size, kNumChannels, external_reset, external_hold);
+    channel.Process(sequence, channel_ramp[i], &output[i], size, kNumChannels, external_reset, external_hold, NULL, 0);
     }
   }
 }

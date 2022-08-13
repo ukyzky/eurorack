@@ -71,11 +71,11 @@ class OutputChannel {
       size_t stride,
       const stmlib::GateFlags* external_reset,
       bool external_hold,
-      float* used_voltages = NULL,
-      int num_used_voltages = 0);
+      float* used_voltages,
+      int num_used_voltages);
 
-  float QuantizeEx(float voltage, float amount, float root, float* used_voltages = NULL, int num_used_voltages = 0);
-  float QuantizeEx2(float voltage, float amount, float root, float* used_voltages = NULL, int num_used_voltages = 0);
+  float QuantizeEx(float voltage, float amount, float root, float* used_voltages, int num_used_voltages);
+  float QuantizeEx2(float voltage, float amount, float root, float* used_voltages, int num_used_voltages);
 
   inline void set_spread(float spread) {
     spread_ = spread;
@@ -109,9 +109,9 @@ class OutputChannel {
     scale_offset_ = scale_offset;
   }
   
-  inline float Quantize(float voltage, float amount, float* used_voltages = NULL, int num_used_voltages = 0) {
+  inline float Quantize(float voltage, float amount, float* used_voltages, int num_used_voltages) {
     quantized_ = true;
-    if (used_voltages) {
+    if (num_used_voltages > 0) {
       return quantizer_[scale_index_].ProcessEx(voltage, amount, false, used_voltages, num_used_voltages);
     }
     return quantizer_[scale_index_].Process(voltage, amount, false);

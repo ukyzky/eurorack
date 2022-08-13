@@ -39,7 +39,7 @@ namespace marbles {
 
 const int kMaxDegrees = 16;
 const int kNumThresholds = 7;
-const int kNumThresholdsChord = 14;
+const int kNumThresholdsChord = 12;
 
 struct Degree {
   float voltage;
