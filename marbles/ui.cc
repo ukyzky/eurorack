@@ -166,6 +166,33 @@ LedColor Ui::MakeColor(uint8_t value, bool color_blind) {
 }
 
 /* static */
+LedColor Ui::MakeColorForMarkov(uint8_t value, bool color_blind) {
+  bool blink = (system_clock.milliseconds() & 127) > 64;
+
+  uint8_t bank = value >= 3 ? 1 : 0;
+  value = 2;
+  
+  LedColor color = palette_[value];
+  if (color_blind) {
+    uint8_t pwm_counter = system_clock.milliseconds() & 15;
+    uint8_t triangle = (system_clock.milliseconds() >> 5) & 31;
+    triangle = triangle < 16 ? triangle : 31 - triangle;
+  
+    if (value == 0) {
+      color = pwm_counter < (4 + (triangle >> 2))
+          ? LED_COLOR_GREEN
+          : LED_COLOR_OFF;
+    } else if (value == 1) {
+      color = LED_COLOR_YELLOW;
+    } else {
+      color = pwm_counter == 0 ? LED_COLOR_RED : LED_COLOR_OFF;
+    }
+  }
+
+  return blink || !bank ? color : LED_COLOR_OFF;
+}
+
+/* static */
 LedColor Ui::DejaVuColor(DejaVuState state, bool lock) {
   if (state == DEJA_VU_OFF) {
     return LED_COLOR_OFF;
@@ -213,7 +240,11 @@ void Ui::UpdateLEDs() {
     case UI_MODE_NORMAL:
     case UI_MODE_RECORD_SCALE:
       {
-        leds_.set(LED_T_MODEL, MakeColor(state.t_model, cb));
+        if (state.t_model == 6) { // markov
+          leds_.set(LED_T_MODEL, MakeColorForMarkov(state.t_model, cb));
+        } else {
+          leds_.set(LED_T_MODEL, MakeColor(state.t_model, cb));
+        }
         leds_.set(LED_T_RANGE, MakeColor(state.t_range, cb));
         leds_.set(
             LED_T_DEJA_VU,
@@ -340,6 +371,13 @@ void Ui::OnSwitchReleased(const Event& e) {
     
     case SWITCH_T_MODEL:
       {
+        if (state->t_model == 6) { // markov
+          if (e.data >= kLongPressDuration) {
+            state->t_model = 2; // it will become 5 by following judgement.
+          } else {
+            state->t_model = 1; // it will become 2 by following judgement.
+          }
+        }
         uint8_t bank = state->t_model / 3;
         if (e.data >= kLongPressDuration) {
           if (!bank) {
@@ -360,6 +398,11 @@ void Ui::OnSwitchReleased(const Event& e) {
       {
         if (mode_ >= UI_MODE_CALIBRATION_1 && mode_ <= UI_MODE_CALIBRATION_4) {
           NextCalibrationStep();
+        } else if (switches_.pressed(SWITCH_T_MODEL)) { // pressing T model and T range
+          if (state->t_model != 6) {
+            state->t_model = 6; // markov
+            ignore_release_[SWITCH_T_MODEL] = true;
+          }
         } else {
           state->t_range = (state->t_range + 1) % 3;
         }

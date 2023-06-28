@@ -112,6 +112,7 @@ class Ui {
   void UpdateHiddenParameters();
   void TerminateScaleRecording();
   static LedColor MakeColor(uint8_t value, bool color_blind);
+  static LedColor MakeColorForMarkov(uint8_t value, bool color_blind);
   static LedColor DejaVuColor(DejaVuState state, bool lock);
   
   stmlib::EventQueue<16> queue_;
